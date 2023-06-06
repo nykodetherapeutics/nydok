@@ -1,0 +1,64 @@
+name: Main
+
+on: [push, pull_request]
+
+env:
+  IMAGE_NAME: ${{ github.ref_name }}-${{ github.run_id }}
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Lint
+        run: make lint
+
+      - name: Run tests
+        run: make test
+
+  docs:
+    name: Deploy documentation
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Create docs
+        run: |
+          make docs &&
+          mv .local/output/docs public
+
+      - name: Deploy to Pages
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: public
+
+  release:
+    name: Release
+    needs: [test]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Generate changelog
+        run: make changelog
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: changelog.md
+
+      - name: Publish to PyPI
+        env:
+          VERSION: ${{ github.ref_name }}
+          USERNAME: __token__
+          PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: make publish

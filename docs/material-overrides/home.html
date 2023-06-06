@@ -1,0 +1,200 @@
+{% extends "main.html" %}
+{% block tabs %}
+{{ super() }}
+<style>
+    .md-header,
+    .md-tabs {
+        background-color: #ff7700;
+    }
+
+    .md-header__title,
+    .md-logo,
+    .md-search {
+        visibility: hidden;
+    }
+
+    .md-container {
+        overflow: hidden;
+    }
+
+    .mdx-container>div.md-grid {
+        max-width: 100vw !important;
+        position: relative;
+    }
+
+    .mdx-hero__image {
+        background-color: #ff7700;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900'%3E%3Cpolygon fill='%23cc0000' points='957 450 539 900 1396 900'/%3E%3Cpolygon fill='%23aa0000' points='957 450 872.9 900 1396 900'/%3E%3Cpolygon fill='%23d6002b' points='-60 900 398 662 816 900'/%3E%3Cpolygon fill='%23b10022' points='337 900 398 662 816 900'/%3E%3Cpolygon fill='%23d9004b' points='1203 546 1552 900 876 900'/%3E%3Cpolygon fill='%23b2003d' points='1203 546 1552 900 1162 900'/%3E%3Cpolygon fill='%23d3006c' points='641 695 886 900 367 900'/%3E%3Cpolygon fill='%23ac0057' points='587 900 641 695 886 900'/%3E%3Cpolygon fill='%23c4008c' points='1710 900 1401 632 1096 900'/%3E%3Cpolygon fill='%239e0071' points='1710 900 1401 632 1365 900'/%3E%3Cpolygon fill='%23aa00aa' points='1210 900 971 687 725 900'/%3E%3Cpolygon fill='%23880088' points='943 900 1210 900 971 687'/%3E%3C/svg%3E");
+        /* background by SVGBackgrounds.com, CC BY 4.0 */
+        background-attachment: fixed;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    .nydok-logo {
+        min-width: 10rem;
+        width: 15vw;
+    }
+
+    .mdx-hero__content {
+        position: absolute;
+        top: 25vh;
+        left: 25vw;
+        width: 100vw;
+        height: 900px;
+        color: #fff;
+    }
+
+    .md-header {
+        position: initial
+    }
+
+    .md-header--shadow {
+        box-shadow: none
+    }
+
+    .md-main__inner {
+        margin: 0
+    }
+
+    .md-main,
+    .md-content {
+        display: none
+    }
+
+    .content {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        min-width: 75rem;
+        width: 60vw;
+        margin-left: auto;
+        margin-right: auto;
+        height: 30rem;
+    }
+
+    .content>.left {
+        flex: 1;
+        padding: 2rem;
+    }
+
+    .content>.right {
+        flex: 1;
+        padding: 2rem;
+
+    }
+
+    ul {
+        font-size: 1rem;
+        line-height: 1.9;
+        margin: 1.6em 0 .64em;
+        font-weight: 300;
+        letter-spacing: -.01em;
+    }
+
+    li {
+        list-style: none;
+
+    }
+
+    @media screen and (min-width:60em) {
+        .md-sidebar--secondary {
+            display: none
+        }
+    }
+
+    @media screen and (min-width:76.25em) {
+        .md-sidebar--primary {
+            display: none
+        }
+    }
+</style>
+<section class="mdx-container">
+    <div class="md-grid md-typeset">
+        <div class="mdx-hero">
+            <div class="mdx-hero__image">
+            </div>
+            <div class="mdx-hero__content">
+                <img class="nydok-logo" src="assets/nydok-logo-white.png">
+                <h2>Specification testing framework.</h2>
+                <p>Get on top of your requirement test coverage.</p>
+                <a href=" {{ page.next_page.url | url }}" title="{{ page.next_page.title | e }}"
+                    class="md-button md-button--primary">
+                    Get started
+                </a>
+                <a href="http://www.github.com/nykodetherapeutics/nydok" title="Github" class="md-button">
+                    Github
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mdx-container">
+    <div class="md-grid md-typeset">
+        <div class="content">
+            <div class="left">
+                <ul>
+                    <li>nydok lets you write specification documents as normal Markdown.</li>
+                    <li>It supports a risk assessment process where you can link mitigations to your requirements. </li>
+                    <li>Generates several types of reports in Markdown format, such as:
+                        <ul>
+                            <li>○ Traceability matrix </li>
+                            <li>○ Code review reports (Gitlab) </li>
+                            <li>○ Risk assessment report </li>
+                            <li>○ Test summary report </li>
+                            <li>○ CI pipeline logs report (Gitlab) </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="right">
+                <img src="assets/spec-code.png">
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mdx-container">
+    <div class="md-grid md-typeset">
+        <div class="content">
+            <div class="left">
+                <img src="assets/test-code.png">
+            </div>
+            <div class="right">
+                <ul>
+                    <li>Implement your requirement tests as normal py.test tests </li>
+                    <li>or load the test results from external JUnit XML files. </li>
+                    <li>nydok keeps track of which requirements are missing test cases. </li>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section class="mdx-container">
+    <div class="md-grid md-typeset">
+        <div class="content">
+            <div class="left">
+                <ul>
+                    <li>Each requirement listed in the specification file is counted as a test item and will pass or
+                        fail depending on it's test case. </li>
+                </ul>
+            </div>
+            <div class="right">
+                <img src="assets/output-run.png">
+            </div>
+        </div>
+    </div>
+</section>
+
+
+{% endblock %}
+{% block content %}{% endblock %}
+{% block footer %}{% endblock %}

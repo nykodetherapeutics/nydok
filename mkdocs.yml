@@ -1,0 +1,66 @@
+site_name: nydok
+theme:
+  name: material
+  custom_dir: docs/material-overrides
+  logo: assets/icon.png
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    scheme: nykode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.expand
+    - navigation.instant
+    - header.autohide
+    - content.action.view
+
+repo_url: https://github.com/nykodetherapeutics/nydok
+repo_name: nykodetherapeutics/nydok
+
+extra_css:
+  - extra.css
+
+copyright: Copyright © Nykode Therapeutics
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.details
+  - admonition
+  - footnotes
+  - abbr
+  - attr_list
+  - md_in_html
+  - def_list
+  - mkdocs-click
+  - nydok.markdown_ext:nydok
+
+nav:
+  - Home: index.md
+  - Getting started:
+    - intro.md
+    - installation.md
+    - overview.md
+    - writing-specifications.md
+    - writing-tests.md
+    - csv-report.md
+  - Reports:
+    - reports/code-review.md
+    - reports/pipeline-logs.md
+    - reports/risk-assessment.md
+    - reports/test-reports.md
+    - reports/traceability-matrix.md
+  - CLI:
+    - cli.md
+  - Specifications:
+    - specs-intro.md
+    - specification/urs.spec.md
+    - specification/plugin.spec.md
+    - specification/report.spec.md

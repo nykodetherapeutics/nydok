@@ -1,0 +1,11 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Serve user-guide docs",
+            "type": "shell",
+            "command": "/project/ops/docs/serve.sh",
+            "problemMatcher": []
+        }
+    ]
+}

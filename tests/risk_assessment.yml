@@ -1,0 +1,24 @@
+RA001:
+  description: A requirement is not covered by a test due to user oversight.
+  consequence: The system ends up having untested functionality.
+  prior_probability: high
+  prior_severity: medium
+  prior_detectability: medium
+  mitigation: System must report missing test cases and abort.
+  mitigation_requirement_ids: [UR032]
+  residual_probability: low
+  residual_severity: medium
+  residual_detectability: high
+
+
+RA010:
+  description: A too high risk priority from risk assessment is accepted due to user oversight.
+  consequence: System doesn't implement sufficient risk mitigation.
+  prior_probability: medium
+  prior_severity: medium
+  prior_detectability: medium
+  mitigation: Implement ability to control acceptable risk priority threshold.
+  mitigation_requirement_ids: [UR051]
+  residual_probability: low
+  residual_severity: medium
+  residual_detectability: high

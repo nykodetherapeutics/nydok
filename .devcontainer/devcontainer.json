@@ -1,0 +1,51 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.166.1/containers/docker-existing-dockerfile
+{
+	"name": "nydok",
+	"build": {},
+	"context": "..",
+	"dockerFile": "../Dockerfile",
+	"containerUser": "root",
+	"postCreateCommand": "poetry install",
+	"workspaceMount": "source=${localWorkspaceFolder},target=/project,type=bind",
+	"workspaceFolder": "/project",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"ms-python.vscode-pylance",
+				"ms-python.black-formatter",
+				"ms-python.flake8",
+				"njpwerner.autodocstring"
+			],
+			"settings": {
+				"python.analysis.extraPaths": [
+					"/software/venv/lib/python3.8/site-packages/"
+				],
+				"python.defaultInterpreterPath": "/software/venv/bin/python",
+				"python.formatting.blackPath": "/software/venv/bin/black",
+				"python.formatting.provider": "black",
+				"python.linting.enabled": true,
+				"python.linting.flake8Enabled": true,
+				"python.linting.flake8Path": "/software/venv/bin/flake8",
+				"python.linting.mypyEnabled": true,
+				"python.linting.mypyPath": "/software/venv/bin/mypy",
+				"python.linting.pylintEnabled": false,
+				"python.testing.cwd": "/project",
+				"python.testing.pytestEnabled": true,
+				"python.testing.pytestArgs": [
+					"tests",
+					"-p",
+					"nydok"
+				],
+				"[python]": {
+					"editor.codeActionsOnSave": {
+						"source.organizeImports": true
+					}
+				},
+				"python.testing.unittestEnabled": false,
+				"terminal.integrated.defaultProfile.linux": "bash"
+			}
+		}
+	}
+}
