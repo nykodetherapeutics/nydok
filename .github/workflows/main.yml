@@ -1,9 +1,14 @@
 name: Main
 
-on: [push, pull_request]
+on: [push]
 
 env:
   IMAGE_NAME: ${{ github.ref_name }}-${{ github.run_id }}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   test:
@@ -23,6 +28,9 @@ jobs:
     name: Deploy documentation
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -31,11 +39,13 @@ jobs:
         run: |
           make docs &&
           mv .local/output/docs public
-
-      - name: Deploy to Pages
+      - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v1
         with:
           path: public
+      - name: Deploy to Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
 
   release:
     name: Release
