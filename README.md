@@ -2,6 +2,9 @@
     <img src="https://github.com/nykodetherapeutics/nydok/raw/main/docs/assets/nydok-logo.png" width="70%">
 </div>
 
+[![Main](https://github.com/nykodetherapeutics/nydok/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/nykodetherapeutics/nydok/actions/workflows/main.yml) [![PyPI version](https://badge.fury.io/py/nydok.svg)](https://badge.fury.io/py/nydok)
+
+[Home page](https://nykodetherapeutics.github.io/nydok/) | [Getting started](https://nykodetherapeutics.github.io/nydok/intro/)
 
 **nydok** is a combined specification writing and testing framework, for producing consistent and traceable specification documents. It is developed for Computerized Systems Validation in a GAMP 5 / GxP context, but is applicable to any software development process where traceability is important.
 
