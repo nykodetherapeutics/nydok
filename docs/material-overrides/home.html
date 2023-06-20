@@ -105,11 +105,77 @@
         .md-sidebar--secondary {
             display: none
         }
+
+
     }
 
     @media screen and (min-width:76.25em) {
         .md-sidebar--primary {
             display: none
+        }
+
+
+    }
+
+    .landing-content {
+        margin-top: 3rem;
+        margin-left: 10vw;
+        margin-right: 10vw;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-areas:
+            "a-text a-image"
+            "b-image b-text"
+            "c-text c-image";
+        justify-content: center;
+        align-items: center;
+    }
+
+
+    #a-text {
+        grid-area: a-text;
+    }
+
+    #a-image {
+        grid-area: a-image;
+    }
+
+    #b-text {
+        grid-area: b-text;
+    }
+
+    #b-image {
+        grid-area: b-image;
+    }
+
+    #c-text {
+        grid-area: c-text;
+    }
+
+    #c-image {
+        grid-area: c-image;
+    }
+
+    @media only screen and (max-width: 720px) {
+        .landing-content {
+            grid-template-columns: repeat(1, 1fr);
+            grid-template-areas:
+                "a-text"
+                "a-image"
+                "b-text"
+                "b-image"
+                "c-text"
+                "c-image";
+        }
+
+
+        .mdx-hero__content {
+            position: absolute;
+            top: 25vh;
+            left: 10vw;
+            width: 80vw;
+            height: 900px;
+            color: #fff;
         }
     }
 </style>
@@ -136,8 +202,8 @@
 
 <section class="mdx-container">
     <div class="md-grid md-typeset">
-        <div class="content">
-            <div class="left">
+        <div class="landing-content">
+            <div id="a-text">
                 <ul>
                     <li>nydok lets you write specification documents as normal Markdown.</li>
                     <li>It supports a risk assessment process where you can link mitigations to your requirements. </li>
@@ -152,20 +218,13 @@
                     </li>
                 </ul>
             </div>
-            <div class="right">
+            <div id="a-image">
                 <img src="assets/spec-code.png">
             </div>
-        </div>
-    </div>
-</section>
-
-<section class="mdx-container">
-    <div class="md-grid md-typeset">
-        <div class="content">
-            <div class="left">
+            <div id="b-image">
                 <img src="assets/test-code.png">
             </div>
-            <div class="right">
+            <div id="b-text">
                 <ul>
                     <li>Implement your requirement tests as normal py.test tests </li>
                     <li>or load the test results from external JUnit XML files. </li>
@@ -173,26 +232,20 @@
                 </ul>
 
             </div>
-        </div>
-    </div>
-</section>
-
-
-<section class="mdx-container">
-    <div class="md-grid md-typeset">
-        <div class="content">
-            <div class="left">
+            <div id="c-text">
                 <ul>
                     <li>Each requirement listed in the specification file is counted as a test item and will pass or
                         fail depending on it's test case. </li>
                 </ul>
             </div>
-            <div class="right">
+            <div id="c-image">
                 <img src="assets/output-run.png">
             </div>
         </div>
+
     </div>
 </section>
+
 
 
 {% endblock %}
