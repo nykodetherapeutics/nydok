@@ -67,10 +67,10 @@ def pytest_runtest_call(item):
         specs_manager.add_test_case(test_case)
 
     # Run the test
-    outcome = yield
+    result = yield
 
     # Update TestCase.passed if the test passed
-    if is_pytest_with_testcase(item) and not outcome._excinfo:
+    if is_pytest_with_testcase(item) and not result.excinfo:
         test_case.passed = True
 
 
