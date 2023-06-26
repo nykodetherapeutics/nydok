@@ -3,7 +3,7 @@ name: Main
 on: [push]
 
 env:
-  IMAGE_NAME: ${{ github.ref_name }}-${{ github.run_id }}
+  IMAGE_NAME: nydok-${{ github.run_id }}
 
 permissions:
   contents: read
