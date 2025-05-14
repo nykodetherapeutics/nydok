@@ -68,6 +68,9 @@ jobs:
         with:
           body_path: changelog.md
 
+      - name: Set env
+        run: echo "VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
       - name: Build package dist
         run: make build-package
 
