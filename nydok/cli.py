@@ -55,7 +55,6 @@ def _load_json(path: Path):
     help="Output path (default: stdout).",
 )
 def traceability_matrix(result, base_prefix, categories, output):
-
     if categories:
         assert len(categories.split(",")) % 2 == 0, "Categories must be in pairs."
         categories = list(zip(categories.split(",")[::2], categories.split(",")[1::2]))
@@ -83,7 +82,6 @@ def traceability_matrix(result, base_prefix, categories, output):
     help="Output path (default: stdout).",
 )
 def risk_assessment(result, output):
-
     data = _load_json(Path(result))
     report = create_risk_report(data["risk_assessments"])
 
@@ -103,7 +101,6 @@ def risk_assessment(result, output):
     help="Output path (default: stdout).",
 )
 def test_overview(result, output):
-
     data = _load_json(Path(result))
     report = create_test_overview_report(
         data["requirements"].values(),
@@ -125,7 +122,6 @@ def test_overview(result, output):
     help="Output path (default: stdout).",
 )
 def test_cases(result, output):
-
     data = _load_json(Path(result))
     report = create_test_case_report(
         data["requirements"].values(),
@@ -166,7 +162,6 @@ def test_cases(result, output):
     help="Output path (default: stdout).",
 )
 def code_review(repo_path, to_ref, from_ref, output):
-
     report = create_codereview_report(
         repo_path=repo_path,
         to_ref=to_ref,
@@ -207,7 +202,6 @@ def code_review(repo_path, to_ref, from_ref, output):
     help="Output path (default: stdout).",
 )
 def pipeline_logs(repo_path, pipeline_id, job_names, output):
-
     job_names = job_names.split(",") if job_names else None
 
     report = create_pipeline_logs_report(

@@ -51,7 +51,6 @@ WORKDIR /project
 
 # Default user is root, container is meant to be run on rootless Docker and Github Actions
 USER root
-RUN chmod o+rwX -R /software
 
 # Nicer prompt for shell in dev containers
 RUN echo "PS1='[\[\e[31m\]\A\[\e[m\]] \[\e[33m\]\w\[\e[m\]: '" >> $HOME/.bashrc

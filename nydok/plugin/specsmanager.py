@@ -62,9 +62,7 @@ class SpecsManager:
         return self.test_cases[req_id].passed
 
     def check_risk_assessment(self, permissable_risk_priority: str):
-
         for ra_id, ra in self.risk_assessments.items():
-
             if RISK_ASSESSMENT_CATEGORIES.index(
                 ra.residual_risk_priority
             ) > RISK_ASSESSMENT_CATEGORIES.index(permissable_risk_priority):

@@ -22,7 +22,6 @@ def get_gitlab_token() -> str:
 
 
 def _get_paginated_results(url: str, params: Dict[str, Any]) -> List[Any]:
-
     params = dict(params)
     params.setdefault("per_page", 100)
 
@@ -33,9 +32,9 @@ def _get_paginated_results(url: str, params: Dict[str, Any]) -> List[Any]:
             params=params,
             headers={"Authorization": f"Bearer {get_gitlab_token()}"},
         )
-        assert (
-            resp.status_code == 200
-        ), f"Resource {fetch_url} returned status code {resp.status_code}.\n{resp.text}"
+        assert resp.status_code == 200, (
+            f"Resource {fetch_url} returned status code {resp.status_code}.\n{resp.text}"
+        )
 
         return resp.json(), resp.links.get("next", {}).get("url")
 
@@ -54,9 +53,9 @@ def get_commit_for_tag(repo_path: str, tag: str) -> str:
         fetch_url,
         headers={"Authorization": f"Bearer {get_gitlab_token()}"},
     )
-    assert (
-        resp.status_code == 200
-    ), f"Resource {fetch_url} returned status code {resp.status_code}.\n{resp.text}"
+    assert resp.status_code == 200, (
+        f"Resource {fetch_url} returned status code {resp.status_code}.\n{resp.text}"
+    )
     return resp.json()["commit"]["id"]
 
 
@@ -83,7 +82,6 @@ def get_commits_for_ref(
 
 
 def fetch_mergerequests(repo_path: str) -> List[Dict[str, str]]:
-
     url_encoded_repo_path = quote_plus(repo_path)
 
     api_mrs = _get_paginated_results(
@@ -110,7 +108,6 @@ def fetch_mergerequests(repo_path: str) -> List[Dict[str, str]]:
 def get_pipeline_logs(
     repo_path: str, pipeline_id: int, job_names: Optional[List[str]] = None
 ) -> Dict[str, str]:
-
     url_encoded_repo_path = quote_plus(repo_path)
 
     api_jobs = _get_paginated_results(

@@ -21,7 +21,6 @@ class NydokRequirementProcessor(BlockProcessor):
         return bool(self.RE.match(block))
 
     def run(self, parent, blocks):
-
         # Check fr multiple items in one block.
         items = self.get_items(blocks.pop(0))
 

@@ -19,7 +19,6 @@ RE_NEW_LINE = re.compile(r"\n")
 
 class SpecFile(pytest.File):
     def collect(self):
-
         with open(self.fspath) as f:
             md_data = f.read()
 
@@ -48,12 +47,11 @@ class ReqItem(pytest.Item):
     def __init__(self, name, parent, req: Requirement):
         super().__init__(name, parent)
         self.req: Requirement = req
-        self.duplicate_item: Optional[
-            pytest.Item
-        ] = None  # If there are duplicated Items with same name
+        self.duplicate_item: Optional[pytest.Item] = (
+            None  # If there are duplicated Items with same name
+        )
 
     def runtest(self):
-
         if self.duplicate_item:
             raise DuplicateRequirementException()
         if not specs_manager.has_test_case(self.name):

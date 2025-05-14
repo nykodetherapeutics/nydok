@@ -11,7 +11,7 @@ packages = [
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.10"
 pytest = ">=6.2.5"
 PyYAML = ">=6.0"
 requests = ">=2.28.1"
@@ -19,11 +19,10 @@ lxml = ">=4.8.0"
 click = ">=8.0.0"
 
 [tool.poetry.group.dev.dependencies]
-flake8 = "^3.9.1"
-black = "^22.3.0"
+ruff = "^0.11.9"
 pytest-cov = "^2.11.1"
 coverage = {extras = ["toml"], version = "^5.5"}
-mypy = "^0.910"
+mypy = "^1.15.0"
 isort = "^5.9.3"
 mkdocs-material = "^8.5.10"
 mkdocs-click = "^0.6.0"
@@ -41,13 +40,11 @@ nydok = 'nydok.cli:cli'
 [tool.poetry.plugins."pytest11"]
 nydok = "nydok.plugin.plugin"
 
-[tool.black]
+[tool.ruff]
+lint.unfixable = ["B", "F841", "F401"]
 line-length = 100
+lint.per-file-ignores = {"__init__.py" = ["E402", "F401"]}
+lint.pydocstyle = {convention = "google"}
 
 [tool.coverage.run]
 omit = [ "tests/*" ]
-
-[tool.isort]
-profile = "black"
-
-# For flake8, see .flake8
