@@ -12,9 +12,7 @@ JUNIT_PATTERN = r"(?P<req_id>[A-Z,0-9]+)( \[(?P<refs>[A-Z,0-9]+)\])?: (?P<desc>.
 
 class JUnitFile(pytest.File):
     def collect(self):
-
         with open(self.fspath) as f:
-
             xml_data = lxml.etree.parse(f)
             testsuites = xml_data.getroot()
 
@@ -32,7 +30,6 @@ class JUnitFile(pytest.File):
                 # If there are failures, we select the first failure.
                 chosen_testcases: Dict[str, JUnitItem] = {}
                 for testcase in testcases:
-
                     name = testcase.attrib["name"]
                     classname = testcase.attrib.get("classname", "")
                     # file = testcase.attrib.get("file", "")
@@ -57,7 +54,6 @@ class JUnitFile(pytest.File):
 
                     # Parse out references
                     for re_result in re.finditer(pattern, name):
-
                         matches = re_result.groupdict()
                         refs = []
                         if matches.get("refs"):
@@ -96,7 +92,6 @@ class JUnitItem(pytest.Item):
         self.failures: List[str] = failures
 
     def runtest(self):
-
         if not self.test_case.passed:
             raise FailedTestCaseException()
 

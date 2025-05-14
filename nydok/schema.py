@@ -86,7 +86,6 @@ class RiskAssessment:
     residual_detectability: str
 
     def __post_init__(self):
-
         risk_fields = [
             "prior_probability",
             "prior_severity",

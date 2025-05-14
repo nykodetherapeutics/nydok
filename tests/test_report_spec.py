@@ -253,7 +253,6 @@ def test_code_change_report(pytester):
     from pytest_httpserver import HTTPServer
 
     with HTTPServer() as server:
-
         # For restoring original env afterwards
         _gitlab_url = os.environ.get("GITLAB_URL")
         _gitlab_token = os.environ.get("GITLAB_TOKEN")
@@ -339,7 +338,6 @@ def test_pipeline_logs(pytester) -> None:
     from pytest_httpserver import HTTPServer
 
     with HTTPServer() as server:
-
         # For restoring original env afterwards
         _gitlab_url = os.environ.get("GITLAB_URL")
         _gitlab_token = os.environ.get("GITLAB_TOKEN")

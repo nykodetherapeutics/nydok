@@ -1,6 +1,6 @@
 import functools
 import inspect
-from typing import Any, Callable, List, Tuple, Union
+from typing import Any, Callable, List, Optional, Tuple, Union
 
 from ..schema import TestCase
 
@@ -9,10 +9,10 @@ REQ_TESTCASE_TAG = "__req_testcase__"  # Attribute for storing metadata on the t
 
 def testcase(
     req_id: Union[str, List[str]],
-    testcase_id: str = None,
+    testcase_id: Optional[str] = None,
     desc: str = "",
-    io: List[Tuple[Any, Any]] = None,
-    ref_ids: List[str] = None,
+    io: Optional[List[Tuple[Any, Any]]] = None,
+    ref_ids: Optional[List[str]] = None,
     skip=False,
 ) -> Callable:
     """Register test case for a corresponding requirement.
@@ -46,9 +46,9 @@ def testcase(
     if io:
         if isinstance(io, tuple):
             io = [io]
-        assert all(
-            len(i) == 2 for i in io
-        ), "io argument must be list of tuples [(input, expected_output)]"
+        assert all(len(i) == 2 for i in io), (
+            "io argument must be list of tuples [(input, expected_output)]"
+        )
 
     if not isinstance(req_id, list):
         req_id = [req_id]
@@ -56,7 +56,6 @@ def testcase(
     def outer(func):
         @functools.wraps(func)
         def inner(*args, **kwargs):
-
             # TODO: Check that func is a py.test function (test_)
 
             # Add io arguments to function

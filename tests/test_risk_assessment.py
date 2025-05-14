@@ -83,7 +83,6 @@ def test_risk_assessment_missing_metadata(pytester):
     }
 
     for key in ra_data["RA001"]:
-
         ra_fail_data = {
             "RA001": ra_data["RA001"].copy(),
         }
@@ -105,7 +104,6 @@ def test_risk_assessment_missing_metadata(pytester):
 
 @testcase(["UR051", "FR320", "FR321"])
 def test_residual_risk_priority(pytester):
-
     pytester.plugins = ["nydok"]
     pytester.makepyfile(
         """
@@ -198,7 +196,6 @@ def test_residual_risk_priority(pytester):
 
 @testcase(["FR330", "FR331"])
 def test_risk_assessment_mitigation_requirement_id(pytester):
-
     pytester.plugins = ["nydok"]
     pytester.makepyfile(
         """

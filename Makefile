@@ -12,7 +12,7 @@ FROM_REF ?= $(shell git describe --abbrev=0 --tags $(shell git rev-parse HEAD^))
 TO_REF ?= $(shell git rev-parse --short HEAD)
 VERSION ?= $(TO_REF)
 
-.PHONY: image-name build test lint docs docs-serve shell publish
+.PHONY: build test lint docs docs-serve shell build-package
 
 build:
 	docker build -t $(IMAGE_NAME) .
@@ -72,7 +72,7 @@ shell: build
 	$(IMAGE_NAME) \
 	bash -c 'poetry install && bash'
 
-publish: build
+build-package: build
 	docker run \
 	--rm $(USE_TTY) \
 	-e VERSION \
@@ -82,4 +82,4 @@ publish: build
 	-v $(PWD):/project \
 	-u $(DOCKER_USER) \
 	$(IMAGE_NAME) \
-	ops/dev/publish-package.sh
+	ops/dev/build-package.sh

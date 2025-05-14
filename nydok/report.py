@@ -7,7 +7,6 @@ from .schema import Requirement, RiskAssessment, TestCase
 
 def _render_md_table(header, rows, max_col_width=100):
     def _md_table_row(cols: List[str], col_widths: List[int]):
-
         return " | ".join(
             # Pad each entry with col_widths
             [
@@ -60,7 +59,6 @@ def _traverse_ids_for_req(
     req_impl = next((i for i in candidate_impl if req.id in i.ids), None)
     ref_ids = _get_ids_for_req(req, req_impl)
     for _id in ref_ids:
-
         # Ensure no cycles, or we'll be stuck in an infinite loop
         if _id in seen:
             raise RuntimeError(f"Circular reference detected, {_id} has already been seen")
@@ -151,7 +149,6 @@ def create_test_overview_report(
     reqs: List[Requirement],
     test_cases: List[TestCase],
 ) -> str:
-
     report = ""
 
     # TestCases are repeated if duplicated IDs, use first one
@@ -183,7 +180,6 @@ def create_test_case_report(
     reqs: List[Requirement],
     test_cases: List[TestCase],
 ) -> str:
-
     report = ""
 
     # TestCases are repeated if duplicated IDs, use first one
@@ -198,7 +194,6 @@ def create_test_case_report(
 
         testdata_table = ""
         if test_case.io:
-
             rows: List[List[str]] = list()
             for io_entry in test_case.io:
                 rows.append([str(io_entry[0]), str(io_entry[1])])
@@ -329,7 +324,6 @@ def create_risk_report(
     if risk_assessments:
         report += '<table class="nydok-risk-assessment">'
         for ra in sorted(risk_assessments.values(), key=lambda x: x.id):
-
             mitigation_text = ra.mitigation
 
             # Add requirement ids to mitigation text if present
@@ -423,7 +417,6 @@ def create_codereview_report(
 def create_pipeline_logs_report(
     repo_path: str, pipeline_id: int, job_names: Optional[List[str]] = None
 ) -> str:
-
     logs = get_pipeline_logs(repo_path, pipeline_id, job_names=job_names)
 
     def ansi_to_plain(ansi):
@@ -431,7 +424,6 @@ def create_pipeline_logs_report(
 
     report = ""
     for job_name, job_log in sorted(logs.items()):
-
         job_log = ansi_to_plain(job_log.replace("\n", "<br>"))
         report += f"## {job_name}\n\n"
         report += f'<div class="codehilite"><pre><code>\n{job_log}\n</code></pre></div>\n\n'

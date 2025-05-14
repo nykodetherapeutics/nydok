@@ -3,7 +3,6 @@ from nydok import testcase
 
 @testcase("FR001")
 def test_minimal_passing(pytester):
-
     pytester.plugins = ["nydok"]
 
     pytester.makepyfile(
@@ -27,7 +26,6 @@ def test_minimal_passing(pytester):
 
 @testcase(["FR010", "FR011", "FR110"])
 def test_io_and_refs(pytester):
-
     pytester.plugins = ["nydok"]
 
     pytester.makepyfile(
@@ -56,7 +54,6 @@ def test_io_and_refs(pytester):
 
 @testcase("FR020", desc="Test changing regex from CLI")
 def test_change_regex_cli(pytester):
-
     pytester.plugins = ["nydok"]
 
     # create a temporary pytest test file
@@ -94,7 +91,6 @@ def test_change_regex_cli(pytester):
 
 @testcase("FR021", desc="Test changing regex from config")
 def test_change_regex_config(pytester):
-
     pytester.plugins = ["nydok"]
 
     # create a temporary pytest test file
@@ -250,7 +246,6 @@ JUNIT_XML_TEMPLATE = """
 
 @testcase("FR270", desc="Test loading test results from external sources.")
 def test_external_source(pytester):
-
     pytester.plugins = ["nydok"]
 
     # Test linking tests to requirements
@@ -290,7 +285,6 @@ def test_external_source(pytester):
 
 @testcase("FR280")
 def test_external_source_multiple_name(pytester):
-
     pytester.plugins = ["nydok"]
 
     # Test multiple with same names, no failures
