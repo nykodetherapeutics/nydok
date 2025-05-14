@@ -218,7 +218,7 @@ def create_test_case_report(
 RISK_ITEM_TEMPLATE = """
   <thead>
     <tr>
-      <th class="nydok-risk-id" rowspan="3" style="text-align: center;">{_id}</th>
+      <th class="nydok-risk-id" rowspan="2" style="text-align: center;">{_id}</th>
       <th class="nydok-risk-header nydok-risk-prior" colspan="3" style="text-align: center;">Prior</th>
       <th class="nydok-risk-header nydok-risk-residual" colspan="3" style="text-align: center;">Residual</th>
     </tr>

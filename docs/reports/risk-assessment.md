@@ -17,7 +17,7 @@ The report is provided as a table in HTML format. The following is a rendered ex
 <table class="nydok-risk-assessment">
   <thead>
     <tr>
-      <th class="nydok-risk-id" rowspan="3" style="text-align: center;">RA001</th>
+      <th class="nydok-risk-id" rowspan="2" style="text-align: center;">RA001</th>
       <th class="nydok-risk-header nydok-risk-prior" colspan="3" style="text-align: center;">Prior</th>
       <th class="nydok-risk-header nydok-risk-residual" colspan="3" style="text-align: center;">Residual</th>
     </tr>
