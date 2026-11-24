@@ -16,14 +16,15 @@ The project has a preconfigued `.devcontainer`. If you open the project in VSCod
 
 Developing using other tools is possible, but you'll have to configure linters, formatters and related tools yourself.
 
-### Formatting and linting
+### Formatting, linting and type checking
 
-- The project is using [black](https://github.com/psf/black) for auto-formatting.
-- Linting is handled by `flake8` in CI and `Pylance` if using VSCode.
+- [ruff](https://docs.astral.sh/ruff/) formats and lints the code; see `ruff.toml`. The tests are formatted but not linted.
+- [mypy](https://mypy.readthedocs.io/) type-checks `nydok/`.
+- `make lint` (or `ops/tests/run-linting.sh` inside a container) runs all three, as CI does.
 
-### Type checking
+### Python versions
 
-The project is type-checked by `mypy` by default if using VSCode.
+nydok supports Python 3.10 and newer: HPVSpot, its main user, runs it on 3.10. The image uses Python 3.14 by default; set `PYTHON_VERSION` to use another, e.g. `make test PYTHON_VERSION=3.10`. CI runs the lint and tests on both.
 
 ### Shell access
 
@@ -35,28 +36,16 @@ Note that if you're using VSCode, this will not be the same container that VSCod
 
 ## Testing
 
-### Unit testing
+### Tests
 
-Unit tests should be located next to the relevant source code, inside a `tests` folder.
-
-Example:
-
-```
-├── client.py
-├── parser.py
-└── tests
-    ├── test_client.py
-    └── test_parser.py
-```
-
-Unit tests are executed using [py.test](https://docs.pytest.org/) runner.
+nydok is tested with itself: the tests in `tests/` are `@testcase`s for the requirements in `tests/*.spec.md`, nydok's specification (also published in the documentation). A new test needs a requirement in a spec file, and the reports' output is compared with `tests/snapshots/`.
 
 To run the tests, you have multiple options:
 
 - Use the integrated `Test explorer` inside VSCode
 - Run the tests manually in a new container: `make test`
 - Run the tests inside an existing container: `ops/tests/run-tests.sh`
-- Run py.test yourself if you want to e.g. only run a specific test or change other options: `py.test -s -k function_i_want_to_test src/` (inside container)
+- Run pytest yourself, e.g. to run only some tests: `pytest -s -k function_i_want_to_test` (inside container)
 - Use CI to execute the tests by pushing the code to your branch. It will also provide test coverage information.
 
 ## Documentation
@@ -70,7 +59,7 @@ All documentation is located in the `docs/` folder. To build the documentation y
 
 `make docs`
 
-This will both generate the HTML site for publishing and a PDF of the documentation.
+This generates the HTML site in `.local/output/docs`.
 
 ### Developing
 
@@ -81,3 +70,7 @@ For development, you can start the MkDocs development server:
 It will start a server on an available port, which lets you open the documentation in a local browser. Any changes you make to the documentation code will be instantly updated in the browser.
 
 To find out which port you should connect to on the host, you can use `docker ps` and locate the container that is running.
+
+## Releases
+
+Pushing a tag `vX.Y.Z` builds the package, publishes it to PyPI and creates a GitHub release. The release notes are made by [git-cliff](https://git-cliff.org/) (`make changelog`, with its default configuration) from the commit messages since the previous tag. Only [conventional commits](https://www.conventionalcommits.org/) (e.g. `fix: ...`, `chore: ...`, `ci: ...`) are included.

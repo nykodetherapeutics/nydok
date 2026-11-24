@@ -88,7 +88,7 @@ Since nydok utilizes py.test, each `Requirement` counts as a test item in py.tes
 
 ```
 ============================= test session starts ==============================
-platform linux -- Python 3.8.10, pytest-6.2.5, py-1.11.0, pluggy-1.0.0
+platform linux -- Python 3.14.7, pytest-9.2.0, pluggy-1.7.0
 rootdir: /project
 plugins: nydok-0.0
 collected 13 items

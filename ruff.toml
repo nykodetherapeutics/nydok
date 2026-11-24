@@ -50,6 +50,8 @@ exclude = [
 ]
 
 [format]
+# Ruff also formats code blocks in Markdown, which would change the test snapshots
+exclude = ["*.md"]
 # Use double quotes
 quote-style = "double"
 # Indent with spaces

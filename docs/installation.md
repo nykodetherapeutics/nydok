@@ -23,7 +23,7 @@ $ py.test \
     specifications/
 
 ========================== test session starts ==========================
-platform linux -- Python 3.8.10, pytest-6.2.5, py-1.11.0, pluggy-1.0.0
+platform linux -- Python 3.14.7, pytest-9.2.0, pluggy-1.7.0
 rootdir: /project, configfile: pyproject.toml
 plugins: nydok-0.2
 collected 3 items

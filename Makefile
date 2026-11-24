@@ -1,7 +1,9 @@
 SHELL := /bin/bash
 
 GIT_REF ?= $(shell git rev-parse --verify --short HEAD)
-IMAGE_NAME ?= nydok_$(GIT_REF)-$(USER)
+# Python in the image; CI also builds with the oldest supported, 3.10
+PYTHON_VERSION ?= 3.14
+IMAGE_NAME ?= nydok_$(GIT_REF)-$(USER)-py$(PYTHON_VERSION)
 
 # If running in CI or rootless mode, use root inside the container, otherwise use the container user
 DOCKER_USER ?= $(shell docker info 2>/dev/null | grep -q rootless && echo 0:0 || echo $(shell id -u):$(shell id -g) )
@@ -12,10 +14,10 @@ FROM_REF ?= $(shell git describe --abbrev=0 --tags $(shell git rev-parse HEAD^))
 TO_REF ?= $(shell git rev-parse --short HEAD)
 VERSION ?= $(TO_REF)
 
-.PHONY: build test lint docs docs-serve shell build-package
+.PHONY: build test changelog lint docs docs-serve shell build-package
 
 build:
-	docker build -t $(IMAGE_NAME) .
+	docker build --build-arg PYTHON_VERSION=$(PYTHON_VERSION) -t $(IMAGE_NAME) .
 
 test: build
 	docker run \
@@ -34,7 +36,7 @@ changelog: build
 	-v $(PWD)/.local/output:/output \
 	-u $(DOCKER_USER) \
 	$(IMAGE_NAME) \
-	bash -c 'git-cliff -r /project ${FROM_REF}..${TO_REF} > changelog.md'
+	bash -c 'git-cliff -r /project -- ${FROM_REF}..${TO_REF} > changelog.md'
 
 docs: build
 	mkdir -p .local/output

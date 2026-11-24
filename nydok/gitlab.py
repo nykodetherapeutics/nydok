@@ -7,7 +7,7 @@ import os
 from typing import Any
 from urllib.parse import quote_plus
 
-import requests  # type: ignore
+import requests
 
 # Seconds to wait for GitLab to connect or send data; without it a stalled request hangs forever
 TIMEOUT = 60
