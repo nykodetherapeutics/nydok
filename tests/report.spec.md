@@ -18,6 +18,7 @@ The output is provided in Markdown table format.
 - FR510 [UR080]: Traceability matrix report must list requirement IDs, description, references and test cases.
 - FR520 [UR080]: Traceability matrix report must support filtering requirement IDs on a given prefix.
 - FR530 [UR080]: Traceability matrix report must support configuring columns showing reference requirement IDs.
+- FR540 [UR080]: Traceability matrix report must support reaching the same reference ID through several references, and must raise an error for circular references.
 
 ## Risk assessment report
 
@@ -33,6 +34,7 @@ The test overview report displays a table of all the test cases, their descripti
 ### Functional requirements
 
 - FR600 [UR070]: The test overview report must display a table of test cases, their description and pass or fail status, ordered by test case ID.
+- FR601 [UR070]: The test overview and test case reports must leave out test cases with `skip=True` and no test case ID.
 
 ## Test case report
 

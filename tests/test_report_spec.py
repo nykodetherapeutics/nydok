@@ -1,8 +1,17 @@
 import os
+import re
 import subprocess
 from pathlib import Path
 
+import pytest
+
 from nydok import testcase
+from nydok.report import (
+    create_test_case_report,
+    create_test_overview_report,
+    create_traceability_matrix,
+)
+from nydok.schema import Requirement, TestCase
 
 SCRIPT_DIR = Path(__file__).parent
 
@@ -393,3 +402,41 @@ def test_pipeline_logs(pytester) -> None:
         os.environ["GITLAB_TOKEN"] = _gitlab_token
     if _gitlab_url:
         os.environ["GITLAB_URL"] = _gitlab_url
+
+
+def _req(_id, refs=()):
+    return Requirement(_id, f"Requirement {_id}", Path("x.spec.md"), 1, list(refs))
+
+
+def _tc(ids, testcase_id, skip=False):
+    return TestCase(ids, testcase_id, "", None, "test_func", None, [], skip, True)
+
+
+@testcase("FR540")
+def test_traceability_matrix_shared_and_circular_references():
+    # FR001 reaches UR001 both directly and through FR002
+    reqs = [_req("UR001"), _req("FR002", ["UR001"]), _req("FR001", ["UR001", "FR002"])]
+    report = create_traceability_matrix(
+        reqs, [], categories=[("User req.", "UR")], base_prefix="FR"
+    )
+    assert re.search(r"^UR001 +\| FR001 ", report, re.MULTILINE)
+
+    reqs = [_req("FR001", ["FR002"]), _req("FR002", ["FR001"])]
+    with pytest.raises(RuntimeError, match="Circular reference"):
+        create_traceability_matrix(reqs, [], categories=[("User req.", "UR")], base_prefix="FR")
+
+
+@testcase("FR601")
+def test_reports_leave_out_skipped_test_cases_without_id():
+    reqs = [_req("FR001"), _req("FR002"), _req("FR003")]
+    test_cases = [
+        _tc(["FR002"], None, skip=True),
+        _tc(["FR001"], "TC001"),
+        _tc(["FR003"], None, skip=True),
+    ]
+
+    overview = create_test_overview_report(reqs, test_cases)
+    assert "TC001" in overview and "None" not in overview
+
+    report = create_test_case_report(reqs, test_cases)
+    assert "## TC001" in report and "None" not in report

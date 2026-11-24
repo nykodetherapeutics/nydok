@@ -26,8 +26,8 @@ class SpecsManager:
         self.risk_assessments: Dict[str, RiskAssessment] = {}
 
     def enable_risk_assessment(self, path: str):
-        with open(path, "r") as file:
-            for _id, risk in yaml.full_load(file).items():
+        with open(path, encoding="utf-8") as file:
+            for _id, risk in yaml.safe_load(file).items():
                 self.risk_assessments[_id] = RiskAssessment.from_dict(_id, risk)
 
     def _format_testcase_id(self) -> str:
@@ -89,7 +89,7 @@ class SpecsManager:
             cls=DataclassJsonEncoder,
             indent=4,
         )
-        path.write_text(data)
+        path.write_text(data, encoding="utf-8")
 
 
 specs_manager = SpecsManager()

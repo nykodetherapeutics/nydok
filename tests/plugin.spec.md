@@ -28,6 +28,7 @@ The following requirements relates to the high level functionality of the plugin
 - FR020 [UR031]: Plugin must support changing regex used for parsing by command line argument.
 - FR021 [UR031]: Plugin must support changing regex used for parsing by configuration file.
 - FR030 [UR033]: One `Test Case` must be able to reference one or several `Requirement`s.
+- FR040 [UR010]: Plugin and reports must read and write files as UTF-8, regardless of the system locale.
 
 
 ## py.test integration
@@ -104,6 +105,7 @@ class Requirement{
 ### Functional requirements
 
 - FR100 [UR030]: Given two `Requirement`s referencing the same requirement ID, the second item must raise a `DuplicateRequirementException`.
+- FR101 [UR030]: The failure for a duplicated `Requirement` must give the location of both the duplicate and the earlier definition.
 - FR110 [UR040]: A `Requirement` must be able to contain references represented as text strings.
 - FR120 [UR32]: A `Requirement` must have a test case associated with it, otherwise the `Requirement` test must fail.
 
@@ -159,6 +161,9 @@ The plugin supports JUnit result files as a source for test results. These files
 
 - FR270 [UR045]: Plugin must support JUnit XML result files as test result source.
 - FR280 [UR045]: Given several test cases within a test suite sharing the same name, the plugin must select the first failing test case. If no test cases are failing, the first test case must be selected.
+- FR281 [UR045]: A JUnit test case with an `<error>` element must fail, like one with a `<failure>` element.
+- FR282 [UR045]: A JUnit `<failure>` or `<error>` element without text must be reported with its `message` attribute.
+- FR283 [UR045]: Plugin must support JUnit XML files whose root element is a single `<testsuite>`.
 
 
 ## Risk Assessment

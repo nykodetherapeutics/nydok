@@ -1,5 +1,5 @@
 import re
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, FrozenSet, List, Optional, Set, Tuple
 
 from .gitlab import fetch_mergerequests, get_commits_for_ref, get_pipeline_logs
 from .schema import Requirement, RiskAssessment, TestCase
@@ -49,20 +49,21 @@ def _traverse_ids_for_req(
     candidate_reqs: List[Requirement],
     candidate_impl: List[TestCase],
     prefix: str,
-    seen: Optional[Set[str]] = None,
+    path: FrozenSet[str] = frozenset(),
 ) -> Set[str]:
-    result: Set[str] = set()
+    """IDs with `prefix` that `req` references, directly or through other requirements.
 
-    if seen is None:
-        seen = set()
+    `path` holds the IDs followed to reach `req`. Only those make a cycle: an ID reached along
+    several paths (e.g. FR1 -> UR1 and FR1 -> FR2 -> UR1) is not one.
+    """
+    result: Set[str] = set()
 
     req_impl = next((i for i in candidate_impl if req.id in i.ids), None)
     ref_ids = _get_ids_for_req(req, req_impl)
     for _id in ref_ids:
         # Ensure no cycles, or we'll be stuck in an infinite loop
-        if _id in seen:
+        if _id in path:
             raise RuntimeError(f"Circular reference detected, {_id} has already been seen")
-        seen.add(_id)
 
         if _id.startswith(prefix):
             result.add(_id)
@@ -71,7 +72,7 @@ def _traverse_ids_for_req(
             if referenced_req := next((r for r in candidate_reqs if r.id == _id), None):
                 result.update(
                     _traverse_ids_for_req(
-                        referenced_req, candidate_reqs, candidate_impl, prefix, seen
+                        referenced_req, candidate_reqs, candidate_impl, prefix, path | {_id}
                     )
                 )
     return result
@@ -145,17 +146,27 @@ def create_traceability_matrix(
     return report
 
 
+def _unique_test_cases(test_cases: List[TestCase]) -> Dict[str, TestCase]:
+    """Test cases by test case ID, sorted by ID.
+
+    A test case is repeated once per requirement it covers; the first one is used. `skip=True` test
+    cases without an explicit ID have none, and are left out.
+    """
+    report_test_cases: Dict[str, TestCase] = {}
+    for test_case in sorted(
+        (tc for tc in test_cases if tc.testcase_id), key=lambda x: x.testcase_id
+    ):
+        report_test_cases.setdefault(test_case.testcase_id, test_case)
+    return report_test_cases
+
+
 def create_test_overview_report(
     reqs: List[Requirement],
     test_cases: List[TestCase],
 ) -> str:
     report = ""
 
-    # TestCases are repeated if duplicated IDs, use first one
-    report_test_cases: Dict[str, TestCase] = {}
-    for test_case in sorted(test_cases, key=lambda x: x.testcase_id):
-        if test_case.testcase_id not in report_test_cases:
-            report_test_cases[test_case.testcase_id] = test_case
+    report_test_cases = _unique_test_cases(test_cases)
 
     # Print summary table
     report += (
@@ -182,11 +193,7 @@ def create_test_case_report(
 ) -> str:
     report = ""
 
-    # TestCases are repeated if duplicated IDs, use first one
-    report_test_cases: Dict[str, TestCase] = {}
-    for test_case in sorted(test_cases, key=lambda x: x.testcase_id):
-        if test_case.testcase_id not in report_test_cases:
-            report_test_cases[test_case.testcase_id] = test_case
+    report_test_cases = _unique_test_cases(test_cases)
 
     # Print individual test cases
     for test_case in report_test_cases.values():

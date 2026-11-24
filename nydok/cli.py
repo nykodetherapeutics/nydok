@@ -26,7 +26,7 @@ def report():
 
 
 def _load_json(path: Path):
-    data = json.loads(path.read_text())
+    data = json.loads(path.read_text(encoding="utf-8"))
     return {
         "test_cases": {_id: TestCase(**test_case) for _id, test_case in data["test_cases"].items()},
         "requirements": {
@@ -45,7 +45,7 @@ def _load_json(path: Path):
 @click.option(
     "--categories",
     type=str,
-    help="Categories for traceability (title,prefix). Repeat for multiple.",
+    help="Comma-separated title,prefix pairs, one per extra column. E.g. 'User req.,UR,Design,DR'.",
 )
 @click.option(
     "--output",
@@ -56,7 +56,8 @@ def _load_json(path: Path):
 )
 def traceability_matrix(result, base_prefix, categories, output):
     if categories:
-        assert len(categories.split(",")) % 2 == 0, "Categories must be in pairs."
+        if len(categories.split(",")) % 2 != 0:
+            raise click.BadParameter("Categories must be in pairs.", param_hint="--categories")
         categories = list(zip(categories.split(",")[::2], categories.split(",")[1::2]))
 
     data = _load_json(Path(result))
@@ -69,7 +70,7 @@ def traceability_matrix(result, base_prefix, categories, output):
     if output == "-":
         sys.stdout.write(report + "\n")
     else:
-        Path(output).write_text(report)
+        Path(output).write_text(report, encoding="utf-8")
 
 
 @report.command(help="Create risk assessment tables.")
@@ -88,7 +89,7 @@ def risk_assessment(result, output):
     if output == "-":
         sys.stdout.write(report)
     else:
-        Path(output).write_text(report)
+        Path(output).write_text(report, encoding="utf-8")
 
 
 @report.command(help="Create test overview table.")
@@ -109,7 +110,7 @@ def test_overview(result, output):
     if output == "-":
         sys.stdout.write(report)
     else:
-        Path(output).write_text(report)
+        Path(output).write_text(report, encoding="utf-8")
 
 
 @report.command(help="Create test case report.")
@@ -130,7 +131,7 @@ def test_cases(result, output):
     if output == "-":
         sys.stdout.write(report)
     else:
-        Path(output).write_text(report)
+        Path(output).write_text(report, encoding="utf-8")
 
 
 @report.command(help="Create code review table.")
@@ -146,7 +147,7 @@ def test_cases(result, output):
     "-c",
     type=str,
     default="main",
-    help="Git ref for end of commit range. Default is default branch configured for repository.",
+    help="Git ref for end of commit range. Default: main.",
 )
 @click.option(
     "--from-ref",
@@ -170,7 +171,7 @@ def code_review(repo_path, to_ref, from_ref, output):
     if output == "-":
         sys.stdout.write(report)
     else:
-        Path(output).write_text(report)
+        Path(output).write_text(report, encoding="utf-8")
 
 
 @report.command(help="Create pipeline logs report.")
@@ -210,4 +211,4 @@ def pipeline_logs(repo_path, pipeline_id, job_names, output):
     if output == "-":
         sys.stdout.write(report)
     else:
-        Path(output).write_text(report)
+        Path(output).write_text(report, encoding="utf-8")

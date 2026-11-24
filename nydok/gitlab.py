@@ -4,15 +4,14 @@ from urllib.parse import quote_plus
 
 import requests  # type: ignore
 
+# Seconds to wait for GitLab to connect or send data; without it a stalled request hangs forever
+TIMEOUT = 60
+
 
 def get_api_url() -> str:
     if not os.environ.get("GITLAB_URL"):
         raise RuntimeError("Environment variable GITLAB_URL is required, but not set")
     return os.environ["GITLAB_URL"] + "/api/v4"
-
-
-def get_graphql_url() -> str:
-    return os.environ["GITLAB_URL"] + "/api/graphql"
 
 
 def get_gitlab_token() -> str:
@@ -31,10 +30,12 @@ def _get_paginated_results(url: str, params: Dict[str, Any]) -> List[Any]:
             fetch_url,
             params=params,
             headers={"Authorization": f"Bearer {get_gitlab_token()}"},
+            timeout=TIMEOUT,
         )
-        assert resp.status_code == 200, (
-            f"Resource {fetch_url} returned status code {resp.status_code}.\n{resp.text}"
-        )
+        if resp.status_code != 200:
+            raise RuntimeError(
+                f"Resource {fetch_url} returned status code {resp.status_code}.\n{resp.text}"
+            )
 
         return resp.json(), resp.links.get("next", {}).get("url")
 
@@ -45,20 +46,6 @@ def _get_paginated_results(url: str, params: Dict[str, Any]) -> List[Any]:
     return api_results
 
 
-def get_commit_for_tag(repo_path: str, tag: str) -> str:
-    url_encoded_repo_path = quote_plus(repo_path)
-
-    fetch_url = get_api_url() + f"/projects/{url_encoded_repo_path}/repository/tags/{tag}"
-    resp = requests.get(
-        fetch_url,
-        headers={"Authorization": f"Bearer {get_gitlab_token()}"},
-    )
-    assert resp.status_code == 200, (
-        f"Resource {fetch_url} returned status code {resp.status_code}.\n{resp.text}"
-    )
-    return resp.json()["commit"]["id"]
-
-
 def get_commits_for_ref(
     repo_path: str, to_ref: Optional[str] = None, from_ref: Optional[str] = None
 ) -> List[str]:
@@ -66,15 +53,9 @@ def get_commits_for_ref(
 
     url_encoded_repo_path = quote_plus(repo_path)
 
-    params = {}
-    if from_ref or to_ref:
-        from_ref = from_ref or ""
-        to_ref = to_ref or ""
-        params["ref_name"] = f"{from_ref}...{to_ref}"
-
     api_commits = _get_paginated_results(
         get_api_url() + f"/projects/{url_encoded_repo_path}/repository/commits",
-        {"ref_name": f"{from_ref}...{to_ref}" if from_ref else to_ref},
+        {"ref_name": f"{from_ref}...{to_ref or ''}" if from_ref else to_ref},
     )
 
     commits = [c["id"] for c in api_commits]
@@ -125,6 +106,7 @@ def get_pipeline_logs(
         resp = requests.get(
             get_api_url() + f"/projects/{url_encoded_repo_path}/jobs/{str(job['id'])}/trace",
             headers={"Authorization": f"Bearer {get_gitlab_token()}"},
+            timeout=TIMEOUT,
         )
         if resp.status_code != 200:
             raise RuntimeError(f"Failed to obtain log for job {job['id']}")

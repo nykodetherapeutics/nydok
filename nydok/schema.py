@@ -51,6 +51,8 @@ RISK_ASSESSMENT_PRIORITY = {
 
 @dataclass
 class TestCase:
+    __test__ = False  # Not a pytest test class, despite the name
+
     ids: List[str]
     testcase_id: str
     desc: str

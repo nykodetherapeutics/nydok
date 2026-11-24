@@ -18,7 +18,7 @@ RE_NEW_LINE = re.compile(r"\n")
 
 class SpecFile(pytest.File):
     def collect(self):
-        with open(self.path) as f:
+        with open(self.path, encoding="utf-8") as f:
             md_data = f.read()
 
         # Get regex to use
@@ -46,9 +46,8 @@ class ReqItem(pytest.Item):
     def __init__(self, name, parent, req: Requirement):
         super().__init__(name, parent)
         self.req: Requirement = req
-        self.duplicate_item: Optional[pytest.Item] = (
-            None  # If there are duplicated Items with same name
-        )
+        # Earlier ReqItem with the same name, if any
+        self.duplicate_item: Optional[ReqItem] = None
 
     def runtest(self):
         if self.duplicate_item:
@@ -66,7 +65,9 @@ class ReqItem(pytest.Item):
         req_info = f"{self.name} ({self.req.file_path.resolve()}:{self.req.line_no})"
 
         if isinstance(excinfo.value, DuplicateRequirementException):
-            req_duplicate_info = f"{self.name} ({self.req.file_path}:{self.req.line_no})"
+            assert self.duplicate_item
+            first = self.duplicate_item.req
+            req_duplicate_info = f"{self.name} ({first.file_path.resolve()}:{first.line_no})"
             return f"Requirement {req_info} is already defined in {req_duplicate_info}\n"
 
         if isinstance(excinfo.value, MissingTestCaseException):

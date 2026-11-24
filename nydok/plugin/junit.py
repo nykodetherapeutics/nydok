@@ -12,9 +12,11 @@ JUNIT_PATTERN = r"(?P<req_id>[A-Z,0-9]+)( \[(?P<refs>[A-Z,0-9]+)\])?: (?P<desc>.
 
 class JUnitFile(pytest.File):
     def collect(self):
-        with open(self.path) as f:
-            xml_data = lxml.etree.parse(f)
-            testsuites = xml_data.getroot()
+        # Binary, so lxml decodes with the file's declared encoding rather than the locale's
+        with open(self.path, "rb") as f:
+            root = lxml.etree.parse(f).getroot()
+            # The root is <testsuites>, or a single <testsuite> in some reporters' output
+            testsuites = [root] if root.tag == "testsuite" else root.findall("testsuite")
 
             pattern = re.compile(
                 self.session.config.getoption("nydok-junit-regex")
@@ -22,7 +24,7 @@ class JUnitFile(pytest.File):
                 or JUNIT_PATTERN
             )
 
-            for testsuite in testsuites.findall("testsuite"):
+            for testsuite in testsuites:
                 testcases = testsuite.findall("testcase")
 
                 # We allow several results for a testcase within a single testsuite
@@ -35,9 +37,12 @@ class JUnitFile(pytest.File):
                     # file = testcase.attrib.get("file", "")
                     # line_no = testcase.attrib.get("line", "")
 
-                    failures: List[str] = []
-                    for failure in testcase.findall("failure"):
-                        failures.append(failure.text)
+                    # <error> is a test that crashed, so it fails like a <failure>.
+                    # Either may have only a message attribute and no text.
+                    failures: List[str] = [
+                        failure.text or failure.get("message") or ""
+                        for failure in testcase.findall("failure") + testcase.findall("error")
+                    ]
 
                     skipped: List[str] = []
                     for skip in testcase.findall("skipped"):
