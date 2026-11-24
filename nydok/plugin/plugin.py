@@ -40,13 +40,13 @@ def pytest_configure(config):
         specs_manager.enable_risk_assessment(ra_file)
 
 
-def pytest_collect_file(parent, path):
+def pytest_collect_file(parent, file_path):
     """Pytest specific hook that is triggered for evaluating inclusion of a file in the tests."""
-    if str(path).endswith(".spec.md"):
-        return SpecFile.from_parent(parent, fspath=path)
+    if file_path.name.endswith(".spec.md"):
+        return SpecFile.from_parent(parent, path=file_path)
 
-    if str(path).endswith(".junit.xml"):
-        return JUnitFile.from_parent(parent, fspath=path)
+    if file_path.name.endswith(".junit.xml"):
+        return JUnitFile.from_parent(parent, path=file_path)
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -79,6 +79,8 @@ def pytest_collection_finish(session):
 
     We need to ensure that all ReqItems runs last,
     in order to make sure that corresponding TestCaseItems can be found.
+    Sorting here rather than in pytest_collection_modifyitems runs it after the reordering
+    done by --lf/--ff/--nf, which wrap that hook.
     """
 
     def sort_req_last(item):

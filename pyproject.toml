@@ -12,7 +12,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-pytest = ">=6.2.5"
+pytest = ">=9.0"
 PyYAML = ">=6.0"
 requests = ">=2.28.1"
 lxml = ">=4.8.0"
@@ -20,8 +20,8 @@ click = ">=8.0.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.11.9"
-pytest-cov = "^2.11.1"
-coverage = {extras = ["toml"], version = "^5.5"}
+pytest-cov = "^7.0"
+coverage = {extras = ["toml"], version = "^7.10"}
 mypy = "^1.15.0"
 isort = "^5.9.3"
 mkdocs-material = "^8.5.10"
@@ -46,5 +46,11 @@ line-length = 100
 lint.per-file-ignores = {"__init__.py" = ["E402", "F401"]}
 lint.pydocstyle = {convention = "google"}
 
+[tool.pytest.ini_options]
+# docs/specification is a symlink to tests/
+testpaths = ["tests"]
+
 [tool.coverage.run]
 omit = [ "tests/*" ]
+# Measure the pytest runs that the tests start with pytester.runpytest_subprocess
+patch = ["subprocess"]

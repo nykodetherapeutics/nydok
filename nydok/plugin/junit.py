@@ -12,7 +12,7 @@ JUNIT_PATTERN = r"(?P<req_id>[A-Z,0-9]+)( \[(?P<refs>[A-Z,0-9]+)\])?: (?P<desc>.
 
 class JUnitFile(pytest.File):
     def collect(self):
-        with open(self.fspath) as f:
+        with open(self.path) as f:
             xml_data = lxml.etree.parse(f)
             testsuites = xml_data.getroot()
 
@@ -106,4 +106,4 @@ class JUnitItem(pytest.Item):
         return super().repr_failure(excinfo)
 
     def reportinfo(self):
-        return self.fspath, None, f"JUnitTestCase: {self.name}"
+        return self.path, None, f"JUnitTestCase: {self.name}"

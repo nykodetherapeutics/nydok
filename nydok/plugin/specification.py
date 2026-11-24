@@ -1,5 +1,4 @@
 import re
-from pathlib import Path
 from typing import Optional
 
 import pytest
@@ -19,7 +18,7 @@ RE_NEW_LINE = re.compile(r"\n")
 
 class SpecFile(pytest.File):
     def collect(self):
-        with open(self.fspath) as f:
+        with open(self.path) as f:
             md_data = f.read()
 
         # Get regex to use
@@ -38,7 +37,7 @@ class SpecFile(pytest.File):
             refs = []
             if matches.get("refs"):
                 refs = matches["refs"].split(",")
-            req = Requirement(req_id, desc, Path(self.fspath), line_no, refs)
+            req = Requirement(req_id, desc, self.path, line_no, refs)
             specs_manager.add_requirement(req)
             yield ReqItem.from_parent(self, name=req_id, req=req)
 
@@ -87,4 +86,4 @@ class ReqItem(pytest.Item):
         return super().repr_failure(excinfo)
 
     def reportinfo(self):
-        return self.fspath, self.req.line_no, f"RequirementTest: {self.name} {self.req.desc}"
+        return self.path, self.req.line_no, f"RequirementTest: {self.name} {self.req.desc}"
