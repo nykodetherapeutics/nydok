@@ -121,10 +121,7 @@ def test_change_regex_config(pytester):
 
     pytester.makefile(
         ".ini",
-        pytest=(
-            "[pytest]\nnydok-specs-regex="
-            "\\|[\\s]*(?P<req_id>[A-Z]+[0-9]+)[\\s]*\\|[\\s]*(?P<desc>.*)[\\s]*\\|\n"
-        ),
+        pytest=("[pytest]\nnydok-specs-regex=\\|[\\s]*(?P<req_id>[A-Z]+[0-9]+)[\\s]*\\|[\\s]*(?P<desc>.*)[\\s]*\\|\n"),
     )
     result = pytester.runpytest_subprocess("-s", "-p", "nydok")
     result.assert_outcomes(passed=2)
@@ -410,9 +407,7 @@ def test_duplicate_requirement_shows_first_definition(pytester):
     )
     result = pytester.runpytest_subprocess("-p", "nydok")
     result.assert_outcomes(passed=2, failed=1)
-    result.stdout.re_match_lines(
-        r"Requirement FR001 \(.*\.spec\.md:4\) is already defined in FR001 \(.*\.spec\.md:3\)"
-    )
+    result.stdout.re_match_lines(r"Requirement FR001 \(.*\.spec\.md:4\) is already defined in FR001 \(.*\.spec\.md:3\)")
 
 
 @testcase("FR040")
@@ -437,7 +432,5 @@ def test_utf8_regardless_of_locale(pytester, monkeypatch):
     result = pytester.runpytest_subprocess("-p", "nydok", "--nydok-output", "nydok.json")
     result.assert_outcomes(passed=2)
 
-    subprocess.check_call(
-        "nydok report test-cases --output report.md nydok.json", shell=True, cwd=pytester.path
-    )
+    subprocess.check_call("nydok report test-cases --output report.md nydok.json", shell=True, cwd=pytester.path)
     assert "Must measure µl" in (pytester.path / "report.md").read_text(encoding="utf-8")

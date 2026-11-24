@@ -1,10 +1,17 @@
-class DuplicateRequirementException(Exception): ...
+"""Exceptions that fail requirement and test case items."""
 
 
-class FailedTestCaseException(Exception): ...
+class DuplicateRequirementException(Exception):
+    """A requirement ID is defined twice, or covered by two test cases."""
 
 
-class MissingTestCaseException(Exception): ...
+class FailedTestCaseException(Exception):
+    """The test case covering a requirement failed."""
 
 
-class RiskPriorityExceedsThresholdException(Exception): ...
+class MissingTestCaseException(Exception):
+    """No test case covers a requirement."""
+
+
+class RiskPriorityExceedsThresholdException(Exception):
+    """A residual risk priority is above the accepted threshold."""

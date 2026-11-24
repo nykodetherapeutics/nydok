@@ -40,12 +40,6 @@ nydok = 'nydok.cli:cli'
 [tool.poetry.plugins."pytest11"]
 nydok = "nydok.plugin.plugin"
 
-[tool.ruff]
-lint.unfixable = ["B", "F841", "F401"]
-line-length = 100
-lint.per-file-ignores = {"__init__.py" = ["E402", "F401"]}
-lint.pydocstyle = {convention = "google"}
-
 [tool.pytest.ini_options]
 # docs/specification is a symlink to tests/
 testpaths = ["tests"]

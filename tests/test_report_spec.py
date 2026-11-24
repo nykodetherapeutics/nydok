@@ -148,9 +148,7 @@ def test_risk_assessment_report(pytester):
     result.assert_outcomes(passed=2, failed=0)
 
     ra_output_file: Path = pytester.makefile(".md", "")
-    subprocess.check_call(
-        f"nydok report risk-assessment --output {ra_output_file.absolute()} nydok.json", shell=True
-    )
+    subprocess.check_call(f"nydok report risk-assessment --output {ra_output_file.absolute()} nydok.json", shell=True)
 
     with open(ra_output_file.absolute(), "r") as f:
         with open(SCRIPT_DIR / "snapshots" / "risk-report.md", "r") as expected:
@@ -197,9 +195,7 @@ def test_test_overview_report(pytester):
     result.assert_outcomes(passed=3, failed=2)
 
     tr_output_file: Path = pytester.makefile(".md", "")
-    subprocess.check_call(
-        f"nydok report test-overview --output {tr_output_file.absolute()} nydok.json", shell=True
-    )
+    subprocess.check_call(f"nydok report test-overview --output {tr_output_file.absolute()} nydok.json", shell=True)
 
     with open(tr_output_file.absolute(), "r") as f:
         with open(SCRIPT_DIR / "snapshots" / "test-overview.md", "r") as expected:
@@ -246,9 +242,7 @@ def test_test_case_report(pytester):
     result.assert_outcomes(passed=3, failed=2)
 
     tr_output_file: Path = pytester.makefile(".md", "")
-    subprocess.check_call(
-        f"nydok report test-cases --output {tr_output_file.absolute()} nydok.json", shell=True
-    )
+    subprocess.check_call(f"nydok report test-cases --output {tr_output_file.absolute()} nydok.json", shell=True)
 
     with open(tr_output_file.absolute(), "r") as f:
         with open(SCRIPT_DIR / "snapshots" / "test-cases.md", "r") as expected:
@@ -416,9 +410,7 @@ def _tc(ids, testcase_id, skip=False):
 def test_traceability_matrix_shared_and_circular_references():
     # FR001 reaches UR001 both directly and through FR002
     reqs = [_req("UR001"), _req("FR002", ["UR001"]), _req("FR001", ["UR001", "FR002"])]
-    report = create_traceability_matrix(
-        reqs, [], categories=[("User req.", "UR")], base_prefix="FR"
-    )
+    report = create_traceability_matrix(reqs, [], categories=[("User req.", "UR")], base_prefix="FR")
     assert re.search(r"^UR001 +\| FR001 ", report, re.MULTILINE)
 
     reqs = [_req("FR001", ["FR002"]), _req("FR002", ["FR001"])]
@@ -435,7 +427,7 @@ def test_reports_leave_out_skipped_test_cases_without_id():
         _tc(["FR003"], None, skip=True),
     ]
 
-    overview = create_test_overview_report(reqs, test_cases)
+    overview = create_test_overview_report(test_cases)
     assert "TC001" in overview and "None" not in overview
 
     report = create_test_case_report(reqs, test_cases)

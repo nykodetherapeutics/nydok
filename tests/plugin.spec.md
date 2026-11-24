@@ -166,6 +166,15 @@ The plugin supports JUnit result files as a source for test results. These files
 - FR283 [UR045]: Plugin must support JUnit XML files whose root element is a single `<testsuite>`.
 
 
+## Markdown extension
+
+nydok includes a [Python-Markdown](https://python-markdown.github.io/) extension, `nydok.markdown_ext:nydok`, for documentation sites (e.g. MkDocs). It renders blocks of requirements as tables.
+
+### Functional requirements:
+
+- FR290 [UR010]: The Markdown extension must render a block of requirements as a table, with a row per requirement holding its ID and description.
+- FR291 [UR040]: The Markdown extension must add a references column if any requirement in the block has references, left empty for those without.
+
 ## Risk Assessment
 
 In order to implement complete traceability of test cases and their respective risk assessments, a system for parsing risk assessment criteria, and being able to link these together with specified requirements must be available.
