@@ -34,12 +34,15 @@ def report() -> None:
 
 @dataclass
 class _Results:
-    test_cases: list[TestCase]  # One entry per requirement covered, so a test case can repeat
+    """Contents of a results JSON. `test_cases` has a test case once per requirement it covers."""
+
+    test_cases: list[TestCase]
     requirements: list[Requirement]
     risk_assessments: dict[str, RiskAssessment]
 
 
 def _load_json(path: Path) -> _Results:
+    """Read a results JSON, as written by the plugin's `nydok-output` setting."""
     data = json.loads(path.read_text(encoding="utf-8"))
     return _Results(
         test_cases=[TestCase(**test_case) for test_case in data["test_cases"].values()],
@@ -55,6 +58,7 @@ def _load_json(path: Path) -> _Results:
 
 
 def _output_option(func: F) -> F:
+    """Add the `--output` option to a command."""
     return click.option(
         "--output",
         "-o",
@@ -65,6 +69,7 @@ def _output_option(func: F) -> F:
 
 
 def _repo_path_option(func: F) -> F:
+    """Add the `--repo-path` option to a command."""
     return click.option(
         "--repo-path",
         "-r",
@@ -75,14 +80,14 @@ def _repo_path_option(func: F) -> F:
 
 
 def _write(text: str, output: str) -> None:
-    """Write `text` to file `output`, or to stdout if it is "-"."""
+    """Write a report to file `output`, or to stdout if it is "-"."""
     if output == "-":
         sys.stdout.write(text)
     else:
         Path(output).write_text(text, encoding="utf-8")
 
 
-@report.command()
+@report.command(help="Create traceability matrix.")
 @click.argument("result", type=click.Path(exists=True))
 @click.option("--base-prefix", type=str, help="Prefix to use as basis (filter).")
 @click.option(
@@ -92,7 +97,7 @@ def _write(text: str, output: str) -> None:
 )
 @_output_option
 def traceability_matrix(result: str, base_prefix: str | None, categories: str | None, output: str) -> None:
-    """Create traceability matrix."""
+    """Write the traceability matrix of the requirements in a results JSON."""
     category_pairs = None
     if categories:
         parts = categories.split(",")
@@ -108,34 +113,34 @@ def traceability_matrix(result: str, base_prefix: str | None, categories: str | 
     _write(text + "\n" if output == "-" else text, output)
 
 
-@report.command()
+@report.command(help="Create risk assessment tables.")
 @click.argument("result", type=click.Path(exists=True))
 @_output_option
 def risk_assessment(result: str, output: str) -> None:
-    """Create risk assessment tables."""
+    """Write the risk assessment tables of a results JSON."""
     data = _load_json(Path(result))
     _write(create_risk_report(data.risk_assessments), output)
 
 
-@report.command()
+@report.command(help="Create test overview table.")
 @click.argument("result", type=click.Path(exists=True))
 @_output_option
 def test_overview(result: str, output: str) -> None:
-    """Create test overview table."""
+    """Write the test overview table of a results JSON."""
     data = _load_json(Path(result))
     _write(create_test_overview_report(data.test_cases), output)
 
 
-@report.command()
+@report.command(help="Create test case report.")
 @click.argument("result", type=click.Path(exists=True))
 @_output_option
 def test_cases(result: str, output: str) -> None:
-    """Create test case report."""
+    """Write the test case report of a results JSON."""
     data = _load_json(Path(result))
     _write(create_test_case_report(data.requirements, data.test_cases), output)
 
 
-@report.command()
+@report.command(help="Create code review table.")
 @_repo_path_option
 @click.option(
     "--to-ref",
@@ -152,11 +157,11 @@ def test_cases(result: str, output: str) -> None:
 )
 @_output_option
 def code_review(repo_path: str, to_ref: str, from_ref: str | None, output: str) -> None:
-    """Create code review table."""
+    """Write the code review report of a GitLab project's commit range."""
     _write(create_codereview_report(repo_path=repo_path, to_ref=to_ref, from_ref=from_ref), output)
 
 
-@report.command()
+@report.command(help="Create pipeline logs report.")
 @_repo_path_option
 @click.option(
     "--pipeline-id",
@@ -173,7 +178,7 @@ def code_review(repo_path: str, to_ref: str, from_ref: str | None, output: str) 
 )
 @_output_option
 def pipeline_logs(repo_path: str, pipeline_id: int, job_names: str | None, output: str) -> None:
-    """Create pipeline logs report."""
+    """Write the pipeline logs report of a GitLab pipeline."""
     text = create_pipeline_logs_report(
         repo_path=repo_path,
         pipeline_id=pipeline_id,

@@ -11,15 +11,12 @@ from ..patterns import DEFAULT_REQ_PATTERN
 
 
 class NydokRequirementProcessor(BlockProcessor):
-    """Render a block of requirements as a table.
-
-    A requirement is a line like `- FR001 [UR001]: The system must be able to do something`.
-    """
+    """Render a block of requirement lines (e.g. `- FR001 [UR001]: Description`) as a table."""
 
     RE = re.compile(DEFAULT_REQ_PATTERN)
 
     def test(self, parent: Element, block: str) -> bool:  # noqa: ARG002
-        """Whether `block` starts with a requirement."""
+        """Check whether a block starts with a requirement."""
         return bool(self.RE.match(block))
 
     def run(self, parent: Element, blocks: list[str]) -> None:
@@ -45,7 +42,7 @@ class NydokRequirementProcessor(BlockProcessor):
             desc_td.attrib["class"] = "req-desc"
 
     def get_items(self, block: str) -> list[dict[str, str | None]]:
-        """Return the fields of each requirement line in `block`."""
+        """Parse the requirement lines of a block; `refs` is None for a requirement without references."""
         return [m.groupdict() for line in block.split("\n") if (m := self.RE.match(line))]
 
 

@@ -1,16 +1,13 @@
-# Ruff configuration
 # https://docs.astral.sh/ruff/configuration/
 
-# Target Python version: the oldest nydok supports (pyproject.toml), which HPVSpot runs.
-# A newer target lets fixes and formatting use syntax this version can't run.
+# The oldest Python nydok supports (pyproject.toml), which HPVSpot runs. A newer target lets fixes
+# and formatting use syntax this version can't run.
 target-version = "py310"
 
-# Line length
 line-length = 120
 indent-width = 4
 
 [lint]
-# Enable a broad set of rules
 select = [
     "E",   # pycodestyle errors
     "W",   # pycodestyle warnings
@@ -30,14 +27,19 @@ select = [
     "ANN", # type annotations
     "D",   # docstring conventions
     "ARG", # unused arguments
+    # pydoclint: docstring sections (Args, Returns, Yields, Raises) match the code.
+    # Preview rules, so listed by full code (see explicit-preview-rules).
+    "DOC102", "DOC201", "DOC202", "DOC402", "DOC403", "DOC501", "DOC502",
 ]
 ignore = ["E712", "N818", "D203", "D213", "D413"]
+# Enable the DOC rules without turning on other preview rules
+preview = true
+explicit-preview-rules = true
 
-# Allow autofix for all enabled rules
 fixable = ["ALL"]
 unfixable = []
 
-# Exclude common non-source directories
+# Formatted but not linted: tests
 exclude = [
     ".git",
     ".venv",
@@ -49,13 +51,17 @@ exclude = [
     "**/tests/**",
 ]
 
+[lint.pydocstyle]
+convention = "google"
+
+[lint.pydoclint]
+# A one-line docstring is enough for a simple function; sections only where they add something
+ignore-one-line-docstrings = true
+
 [format]
 # Ruff also formats code blocks in Markdown, which would change the test snapshots
 exclude = ["*.md"]
-# Use double quotes
 quote-style = "double"
-# Indent with spaces
 indent-style = "space"
-# Trailing commas in multi-line structures
 skip-magic-trailing-comma = false
 line-ending = "auto"

@@ -21,7 +21,7 @@ class JUnitFile(pytest.File):
     """A JUnit XML file, with one JUnitItem per test case whose name matches the JUnit regex."""
 
     def collect(self) -> Iterator["JUnitItem"]:
-        """Yield a JUnitItem per test case name in each test suite."""
+        """Yield a JUnitItem per test case name, in each test suite, that matches the JUnit regex."""
         # Binary, so lxml decodes with the file's declared encoding rather than the locale's
         with open(self.path, "rb") as f:
             root = lxml.etree.parse(f).getroot()
@@ -67,7 +67,7 @@ class JUnitFile(pytest.File):
 
 
 class JUnitItem(pytest.Item):
-    """A test case from a JUnit file, failing if the file reports it as failed."""
+    """A test case from a JUnit file, failing if the file reports a failure or error for it."""
 
     def __init__(
         self,
@@ -76,7 +76,7 @@ class JUnitItem(pytest.Item):
         test_case: TestCase,
         failures: list[str],
     ) -> None:
-        """Create the item for `test_case`, with the texts of its failures and errors."""
+        """Create the item for a JUnit test case, with the texts of its failures and errors."""
         super().__init__(name, parent)
         self.test_case = test_case
         self.failures = failures
@@ -95,5 +95,5 @@ class JUnitItem(pytest.Item):
         return super().repr_failure(excinfo, style)
 
     def reportinfo(self) -> tuple[os.PathLike[str] | str, int | None, str]:
-        """Location and description of the item in pytest's report."""
+        """Give the item's location and description for pytest's report."""
         return self.path, None, f"JUnitTestCase: {self.name}"

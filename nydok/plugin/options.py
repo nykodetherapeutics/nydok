@@ -4,5 +4,5 @@ import pytest
 
 
 def get_option(config: pytest.Config, name: str) -> str | None:
-    """Return setting `name` from the command line, else from the ini file."""
+    """Get a nydok setting from the command line, else from the ini file; None if it isn't set."""
     return config.getoption(name) or config.getini(name) or None

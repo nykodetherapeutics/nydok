@@ -20,6 +20,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     group = parser.getgroup("nydok", "Specification testing")
 
     def add_opt_ini(opt_name: str, help_text: str) -> None:
+        """Register a setting as both a command line option and an ini setting."""
         group.addoption(f"--{opt_name}", dest=opt_name, help=help_text, type=str)
         parser.addini(opt_name, help_text, type="string")
 
@@ -37,7 +38,7 @@ def pytest_configure(config: pytest.Config) -> None:
 
 
 def pytest_collect_file(parent: pytest.Collector, file_path: Path) -> pytest.Collector | None:
-    """Collect specification files and JUnit result files."""
+    """Collect specification files (`*.spec.md`) and JUnit result files (`*.junit.xml`)."""
     if file_path.name.endswith(".spec.md"):
         return SpecFile.from_parent(parent, path=file_path)
     if file_path.name.endswith(".junit.xml"):
@@ -46,7 +47,7 @@ def pytest_collect_file(parent: pytest.Collector, file_path: Path) -> pytest.Col
 
 
 def _testcase_of(item: pytest.Item) -> TestCase | None:
-    """Return the TestCase that `@testcase` attached to a Python test function, if any."""
+    """Get the TestCase that `@testcase` attached to a Python test function, if any."""
     if isinstance(item, pytest.Function):
         return getattr(item.function, REQ_TESTCASE_TAG, None)
     return None
@@ -76,7 +77,7 @@ def pytest_collection_finish(session: pytest.Session) -> None:
     """
 
     def sort_req_last(item: pytest.Item) -> int:
-        # Other items (e.g. JUnitItems) first, then Python test functions, then ReqItems
+        """Sort key: other items (e.g. JUnitItems) first, then Python test functions, then ReqItems."""
         if isinstance(item, ReqItem):
             return 2
         if isinstance(item, pytest.Function):

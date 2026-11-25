@@ -7,9 +7,10 @@ from .schema import Requirement, RiskAssessment, TestCase
 
 
 def _render_md_table(header: list[str], rows: list[list[str]], max_col_width: int = 100) -> str:
-    """Markdown table with each column padded to its widest cell, up to `max_col_width`."""
+    """Render a Markdown table, padding each column to its widest cell, up to `max_col_width`."""
 
     def _md_table_row(cols: list[str], col_widths: list[int]) -> str:
+        """Render one table row, padding each cell to its column's width."""
         return " | ".join(f"{col:<{width}}" for col, width in zip(cols, col_widths, strict=True))
 
     max_col_size = [min(max(len(r[idx]) for r in [header, *rows]), max_col_width) for idx in range(len(header))]
@@ -24,6 +25,7 @@ def _render_md_table(header: list[str], rows: list[list[str]], max_col_width: in
 
 
 def _get_ids_for_req(req: Requirement, req_impl: TestCase | None = None) -> set[str]:
+    """Collect the IDs a requirement references, itself or through its test case."""
     ref_ids: set[str] = set()
     if req.ref_ids:
         ref_ids.update(req.ref_ids)
@@ -40,10 +42,21 @@ def _traverse_ids_for_req(
     prefix: str,
     path: frozenset[str] = frozenset(),
 ) -> set[str]:
-    """IDs with `prefix` that `req` references, directly or through other requirements.
+    """Find the IDs with a prefix that a requirement references, directly or through other requirements.
 
-    `path` holds the IDs followed to reach `req`. Only those make a cycle: an ID reached along
-    several paths (e.g. FR1 -> UR1 and FR1 -> FR2 -> UR1) is not one.
+    Args:
+        req: The requirement.
+        candidate_reqs: All requirements, to follow references through.
+        candidate_impl: All test cases, whose references count as their requirements'.
+        prefix: Prefix of the IDs to find, e.g. "UR".
+        path: The IDs followed to reach `req`. Only those make a cycle: an ID reached along
+            several paths (e.g. FR1 -> UR1 and FR1 -> FR2 -> UR1) is not one.
+
+    Returns:
+        The IDs found.
+
+    Raises:
+        RuntimeError: The references are circular.
     """
     result: set[str] = set()
 
@@ -72,21 +85,17 @@ def create_traceability_matrix(
     base_prefix: str | None = None,
     max_col_width: int = 100,
 ) -> str:
-    """Create a traceability matrix in markdown format.
+    """Create a traceability matrix in Markdown format.
 
-    If categories is provided, the matrix will contain additional columns,
-    one for each category, linking the different requirements together
-    through their references.
+    If categories are given, the matrix has an extra column per category, listing the IDs with
+    the category's prefix that each requirement references, directly or through other requirements.
 
     Args:
         reqs: Requirements to include.
-        test_cases: TestCases for the Requirements
-        categories: List of tuples, containing title and prefix that defines a category.
-                    If none, all requirements are listed.
-        base_prefix: Which requirement prefix to base the matrix upon. Required if
-                     categories is provided.
-        max_col_width: Maximum width of each column in the table.
-
+        test_cases: Test cases of the requirements.
+        categories: (title, prefix) of each extra column. None for no extra columns.
+        base_prefix: Only list the requirements with this prefix. None to list all.
+        max_col_width: Widest padding of a column.
 
     Returns:
         Traceability matrix table in Markdown format.
@@ -130,11 +139,7 @@ def create_traceability_matrix(
 
 
 def _unique_test_cases(test_cases: list[TestCase]) -> dict[str, TestCase]:
-    """Test cases by test case ID, sorted by ID.
-
-    A test case is repeated once per requirement it covers; the first one is used. `skip=True` test
-    cases without an explicit ID have none, and are left out.
-    """
+    """Give the first test case with each test case ID, sorted by ID; ones without an ID are left out."""
     with_id = [(tc.testcase_id, tc) for tc in test_cases if tc.testcase_id]
     report_test_cases: dict[str, TestCase] = {}
     for testcase_id, test_case in sorted(with_id, key=lambda x: x[0]):
@@ -143,7 +148,7 @@ def _unique_test_cases(test_cases: list[TestCase]) -> dict[str, TestCase]:
 
 
 def create_test_overview_report(test_cases: list[TestCase]) -> str:
-    """Markdown table of the test cases, with description and pass or fail, ordered by ID."""
+    """Create a Markdown table of the test cases, with description and pass or fail, ordered by ID."""
     return (
         _render_md_table(
             ["Test case", "Description", "Passed"],
@@ -157,7 +162,7 @@ def create_test_overview_report(test_cases: list[TestCase]) -> str:
 
 
 def create_test_case_report(reqs: list[Requirement], test_cases: list[TestCase]) -> str:
-    """Markdown section per test case, with its requirements, test data and source code."""
+    """Create a Markdown section per test case, with its requirements, test data and source code."""
     report = ""
 
     report_test_cases = _unique_test_cases(test_cases)
@@ -235,16 +240,7 @@ RISK_ITEM_TEMPLATE = """
 def create_risk_report(
     risk_assessments: dict[str, RiskAssessment],
 ) -> str:
-    """Create a risk report from a list of risk assessments as a HTML table.
-
-    The table is sorted by risk assessment ID.
-
-    Args:
-        risk_assessments: A dictionary of risk assessments, given their ID.
-
-    Returns:
-        A HTML table with the risk assessments.
-    """
+    """Create an HTML table of the risk assessments, sorted by ID ("" if there are none)."""
     report = ""
 
     def get_risk_item(item: str, desc: bool = False, _class: str = "", colspan: str = "1") -> str:
@@ -324,17 +320,16 @@ def create_codereview_report(
     to_ref: str | None = None,
     from_ref: str | None = None,
 ) -> str:
-    """Create a report of code changes and their approval status since a given commit.
+    """Create a report of the merge requests merged in a commit range, with their approvers.
 
     Args:
-        repo_path: Path to the repository to generate the report for.
-        to_ref: The commit to generate the report for. If not given, repository
-            HEAD is used.
-        from_ref: The commit to generate the report from. If not given, all
-            commits up until `to_ref` are considered.
+        repo_path: GitLab path of the project, e.g. "my-group/my-project".
+        to_ref: Git ref ending the commit range. If not given, the repository's default branch.
+        from_ref: Git ref starting the commit range (excluded). If not given, all history up to
+            `to_ref`.
 
     Returns:
-        A markdown formatted string containing the report.
+        The report, in Markdown.
     """
     # Get commits from to_ref so we can figure out which merge requests
     # were merged into the commit range. If a from_ref is given, only merge requests

@@ -48,14 +48,19 @@ class ReqItem(pytest.Item):
     """A requirement, passing if exactly one test case covers it and that test case passed."""
 
     def __init__(self, name: str, parent: pytest.Collector, req: Requirement) -> None:
-        """Create the item for `req`."""
+        """Create the item for a requirement."""
         super().__init__(name, parent)
         self.req = req
-        # Earlier ReqItem with the same name, if any
         self.duplicate_item: ReqItem | None = None
 
     def runtest(self) -> None:
-        """Fail if the requirement is duplicated, has no test case, or its test case failed."""
+        """Fail if the requirement is duplicated, has no test case, or its test case failed.
+
+        Raises:
+            DuplicateRequirementException: The requirement ID is defined more than once.
+            MissingTestCaseException: No test case covers the requirement.
+            FailedTestCaseException: The requirement's test case failed.
+        """
         if self.duplicate_item:
             raise DuplicateRequirementException()
         if not specs_manager.has_test_case(self.name):
@@ -64,7 +69,7 @@ class ReqItem(pytest.Item):
             raise FailedTestCaseException()
 
     def _func_name_suggestion(self) -> str:
-        """Test function name from the first words of the description."""
+        """Suggest a test function name, without `test_`, from the first words of the description."""
         return "_".join(re.findall(r"\w+", self.req.desc.lower())[:8])
 
     def repr_failure(
@@ -93,5 +98,5 @@ class ReqItem(pytest.Item):
         return super().repr_failure(excinfo, style)
 
     def reportinfo(self) -> tuple[os.PathLike[str] | str, int | None, str]:
-        """Location and description of the item in pytest's report."""
+        """Give the item's location and description for pytest's report."""
         return self.path, self.req.line_no, f"RequirementTest: {self.name} {self.req.desc}"

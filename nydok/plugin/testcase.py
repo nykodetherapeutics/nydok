@@ -20,12 +20,10 @@ def testcase(
     ref_ids: list[str] | None = None,
     skip: bool = False,
 ) -> Callable[[Callable[..., R]], Callable[..., R]]:
-    """Register test case for a corresponding requirement.
+    """Register a test function as the test case of one or more requirements.
 
-    Test data handling:
-
-    When providing test data using the `io=` argument,
-    the input and expected output can be documented in the test report.
+    Test data given with `io=` is passed to the test function as its `io` argument, and listed
+    in the test case report.
 
     Example:
         @testcase("FR001", "TC001",
@@ -39,13 +37,16 @@ def testcase(
                 assert sum(i) == e
 
     Args:
-        req_id: Requirement id, or list of them.
-        testcase_id: Override test case id. Default is to autogenerate one.
+        req_id: Requirement ID, or list of them.
+        testcase_id: Test case ID. By default one is generated, e.g. "TC001".
         desc: Description of the test case.
-        io: Input/output test data in a tuple, or list of, (input, output).
-        ref_ids: List of ids to other references. An id can be any string.
-        skip: Whether checking test function result should be skipped. Defaults to False.
+        io: Test data: an (input, expected output) tuple, or a list of them.
+        ref_ids: IDs of other references, e.g. risk assessments. An ID can be any string.
+        skip: Don't number the test case, unless `testcase_id` is given. For test functions that
+            only add metadata. Defaults to False.
 
+    Returns:
+        A decorator for the test function.
     """
     # A single (input, output) tuple becomes a list of one
     io_list = [io] if io and isinstance(io, tuple) else (None if io is None else list(io))
@@ -55,9 +56,11 @@ def testcase(
     req_ids = req_id if isinstance(req_id, list) else [req_id]
 
     def outer(func: Callable[..., R]) -> Callable[..., R]:
+        """Attach the TestCase to the test function, wrapped to receive the `io` test data."""
+
         @functools.wraps(func)
         def inner(*args: object, **kwargs: object) -> R:
-            # Add io arguments to function
+            """Call the test function, with the `io` test data if there is any."""
             if io_list:
                 kwargs["io"] = io_list
             return func(*args, **kwargs)

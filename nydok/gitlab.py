@@ -14,27 +14,28 @@ TIMEOUT = 60
 
 
 def get_api_url() -> str:
-    """Return the REST API URL of the GitLab instance in GITLAB_URL."""
+    """Get the REST API URL of the GitLab instance in GITLAB_URL, raising RuntimeError if unset."""
     if not os.environ.get("GITLAB_URL"):
         raise RuntimeError("Environment variable GITLAB_URL is required, but not set")
     return os.environ["GITLAB_URL"] + "/api/v4"
 
 
 def get_gitlab_token() -> str:
-    """Return the GitLab access token in GITLAB_TOKEN."""
+    """Get the GitLab access token in GITLAB_TOKEN, raising RuntimeError if unset."""
     if not os.environ.get("GITLAB_TOKEN"):
         raise RuntimeError("Environment variable GITLAB_TOKEN is required, but not set")
     return os.environ["GITLAB_TOKEN"]
 
 
 def _session() -> requests.Session:
+    """Create an HTTP session authenticated with the GitLab token."""
     session = requests.Session()
     session.headers["Authorization"] = f"Bearer {get_gitlab_token()}"
     return session
 
 
 def _get_paginated_results(session: requests.Session, url: str, params: dict[str, Any]) -> list[Any]:
-    """Return the items of all pages of a GitLab list endpoint."""
+    """Get the items of all pages of a GitLab list endpoint, raising RuntimeError on an error."""
     params = dict(params)
     params.setdefault("per_page", 100)
 
@@ -51,7 +52,16 @@ def _get_paginated_results(session: requests.Session, url: str, params: dict[str
 
 
 def get_commits_for_ref(repo_path: str, to_ref: str | None = None, from_ref: str | None = None) -> list[str]:
-    """Return the IDs of the commits up to `to_ref`, starting after `from_ref` if given."""
+    """Get the IDs of the commits in a range.
+
+    Args:
+        repo_path: GitLab path of the project, e.g. "my-group/my-project".
+        to_ref: Git ref ending the range. If not given, the repository's default branch.
+        from_ref: Git ref starting the range (excluded). If not given, all history up to `to_ref`.
+
+    Returns:
+        The commit IDs.
+    """
     api_commits = _get_paginated_results(
         _session(),
         get_api_url() + f"/projects/{quote_plus(repo_path)}/repository/commits",
@@ -61,7 +71,7 @@ def get_commits_for_ref(repo_path: str, to_ref: str | None = None, from_ref: str
 
 
 def fetch_mergerequests(repo_path: str) -> list[dict[str, str]]:
-    """Return the merged merge requests of a project, with commit, title, date, author and reviewers."""
+    """Get the merged merge requests of a project, with the fields the code review report shows."""
     api_mrs = _get_paginated_results(
         _session(),
         get_api_url() + f"/projects/{quote_plus(repo_path)}/merge_requests",
@@ -80,7 +90,7 @@ def fetch_mergerequests(repo_path: str) -> list[dict[str, str]]:
 
 
 def get_pipeline_logs(repo_path: str, pipeline_id: int, job_names: list[str] | None = None) -> dict[str, str]:
-    """Return the log of each finished job in a pipeline, by job name, optionally only of `job_names`."""
+    """Get the log of each failed or succeeded job in a pipeline, by job name."""
     session = _session()
     project_url = get_api_url() + f"/projects/{quote_plus(repo_path)}"
     api_jobs = _get_paginated_results(
