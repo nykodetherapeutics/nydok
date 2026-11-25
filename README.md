@@ -10,7 +10,7 @@
 
 Write your requirements and risk assessment alongside your Python code, ensuring 1:1 mapping between requirements and the code you're writing.
 
-It is implemented as a plugin for `py.test` for running the tests, combined with a CLI for creating reports.
+It is implemented as a plugin for `pytest` for running the tests, combined with a CLI for creating reports.
 
 ## Features
 
@@ -82,14 +82,14 @@ def test_cowsay():
 
 ```
 
-Next, run `py.test` to check the specification:
+Next, run `pytest` to check the specification:
 
 ```
-$ py.test --nydok-output nydok.json cowsay/
+$ pytest --nydok-output nydok.json cowsay/
 ========================= test session starts =========================
-platform linux -- Python 3.10.6, pytest-6.2.5, py-1.11.0, pluggy-1.0.0
+platform linux -- Python 3.14.7, pytest-9.2.0, pluggy-1.7.0
 rootdir: /project
-plugins: nydok-0.8.0
+plugins: nydok-1.0.0
 collected 3 items
 
 cowsay/test_cowsay.py::test_cowsay PASSED                       [ 33%]

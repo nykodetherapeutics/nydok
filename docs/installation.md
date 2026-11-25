@@ -10,22 +10,22 @@ or using poetry:
 
 `poetry add nydok --group dev`
 
-Once installed it will register itself as a plugin to py.test automatically, along with installing the `nydok` command line tool for generating reports.
+Once installed it will register itself as a plugin to pytest automatically, along with installing the `nydok` command line tool for generating reports.
 
 ## Usage
 
-Once installed, you can simply run `py.test` with the paths to your specification files and corresponding test case implementations:
+Once installed, you can simply run `pytest` with the paths to your specification files and corresponding test case implementations:
 
 ```title="Usage example"
-$ py.test \
+$ pytest \
     --nydok-output="nydok.json" \
     --nydok-risk-assessment="specifications/implementations/risk_assessment.yml" \
     specifications/
 
 ========================== test session starts ==========================
-platform linux -- Python 3.8.10, pytest-6.2.5, py-1.11.0, pluggy-1.0.0
+platform linux -- Python 3.14.7, pytest-9.2.0, pluggy-1.7.0
 rootdir: /project, configfile: pyproject.toml
-plugins: nydok-0.2
+plugins: nydok-1.0.0
 collected 3 items
 
 specifications/implementations/test_example_spec.py .             [ 33%]

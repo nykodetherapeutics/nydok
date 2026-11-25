@@ -1,0 +1,67 @@
+# https://docs.astral.sh/ruff/configuration/
+
+# The oldest Python nydok supports (pyproject.toml), which HPVSpot runs. A newer target lets fixes
+# and formatting use syntax this version can't run.
+target-version = "py310"
+
+line-length = 120
+indent-width = 4
+
+[lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+    "N",   # pep8-naming
+    "ERA", # flake8-eradicate
+    "Q",   # flake8-quotes
+    "T20", # flake8-print
+    "T10", # flake8-debugger
+    "SIM", # flake8-simplify
+    "RET", # flake8-return
+    "RUF", # ruff native quality checks
+    "ANN", # type annotations
+    "D",   # docstring conventions
+    "ARG", # unused arguments
+    # pydoclint: docstring sections (Args, Returns, Yields, Raises) match the code.
+    # Preview rules, so listed by full code (see explicit-preview-rules).
+    "DOC102", "DOC201", "DOC202", "DOC402", "DOC403", "DOC501", "DOC502",
+]
+ignore = ["E712", "N818", "D203", "D213", "D413"]
+# Enable the DOC rules without turning on other preview rules
+preview = true
+explicit-preview-rules = true
+
+fixable = ["ALL"]
+unfixable = []
+
+# Formatted but not linted: tests
+exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+    "*.egg-info",
+    "dist",
+    "build",
+    "archive",
+    "**/tests/**",
+]
+
+[lint.pydocstyle]
+convention = "google"
+
+[lint.pydoclint]
+# A one-line docstring is enough for a simple function; sections only where they add something
+ignore-one-line-docstrings = true
+
+[format]
+# Ruff also formats code blocks in Markdown, which would change the test snapshots
+exclude = ["*.md"]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"

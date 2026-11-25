@@ -1,10 +1,10 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
-// https://github.com/microsoft/vscode-dev-containers/tree/v0.166.1/containers/docker-existing-dockerfile
+// For format details, see https://aka.ms/devcontainer.json
 {
 	"name": "nydok",
-	"build": {},
-	"context": "..",
-	"dockerFile": "../Dockerfile",
+	"build": {
+		"dockerfile": "../Dockerfile",
+		"context": ".."
+	},
 	"containerUser": "root",
 	"postCreateCommand": "poetry install",
 	"workspaceMount": "source=${localWorkspaceFolder},target=/project,type=bind",
@@ -26,10 +26,8 @@
 				"python.testing.pytestArgs": [
 					"."
 				],
-				"python.linting.mypyArgs": [],
 				"mypy-type-checker.importStrategy": "fromEnvironment",
 				"ruff.importStrategy": "fromEnvironment",
-				"python.formatting.provider": "none",
 				"[python]": {
 					"editor.formatOnSave": true,
 					"editor.codeActionsOnSave": {

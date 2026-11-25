@@ -1,3 +1,5 @@
+import subprocess
+
 from nydok import testcase
 
 
@@ -119,10 +121,7 @@ def test_change_regex_config(pytester):
 
     pytester.makefile(
         ".ini",
-        pytest=(
-            "[pytest]\nnydok-specs-regex="
-            "\\|[\\s]*(?P<req_id>[A-Z]+[0-9]+)[\\s]*\\|[\\s]*(?P<desc>.*)[\\s]*\\|\n"
-        ),
+        pytest=("[pytest]\nnydok-specs-regex=\\|[\\s]*(?P<req_id>[A-Z]+[0-9]+)[\\s]*\\|[\\s]*(?P<desc>.*)[\\s]*\\|\n"),
     )
     result = pytester.runpytest_subprocess("-s", "-p", "nydok")
     result.assert_outcomes(passed=2)
@@ -346,3 +345,92 @@ def test_external_source_multiple_name(pytester):
     result = pytester.runpytest_subprocess("-p", "nydok")
     result.assert_outcomes(passed=0, failed=2)
     result.stdout.re_match_lines(r".*First time.*")
+
+
+@testcase(["FR281", "FR282"])
+def test_external_source_error_and_message_only(pytester):
+    pytester.plugins = ["nydok"]
+
+    pytester.makefile(
+        ".junit.xml",
+        JUNIT_XML_TEMPLATE.format(
+            testcase1="FR001: Foo",
+            testcase1failure='<error message="Crashed in setup" type="Error"/>',
+            testcase2="FR002: Bar",
+            testcase2failure='<failure message="Only a message" type="AssertionError"/>',
+        ),
+    )
+    pytester.makefile(
+        ".spec.md",
+        ("# Some heading\n\n- FR001: Some specification\n- FR002: A different specification\n"),
+    )
+    result = pytester.runpytest_subprocess("-p", "nydok")
+    result.assert_outcomes(passed=0, failed=4)
+    result.stdout.re_match_lines(r".*Crashed in setup.*")
+    result.stdout.re_match_lines(r".*Only a message.*")
+
+
+@testcase("FR283")
+def test_external_source_single_testsuite(pytester):
+    pytester.plugins = ["nydok"]
+
+    pytester.makefile(
+        ".junit.xml",
+        (
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<testsuite name="Suite" tests="1">\n'
+            '  <testcase name="FR001: Foo" classname="foo"/>\n'
+            "</testsuite>\n"
+        ),
+    )
+    pytester.makefile(".spec.md", "# Some heading\n\n- FR001: Some specification\n")
+    result = pytester.runpytest_subprocess("-p", "nydok")
+    result.assert_outcomes(passed=2)
+
+
+@testcase("FR101")
+def test_duplicate_requirement_shows_first_definition(pytester):
+    pytester.plugins = ["nydok"]
+
+    pytester.makepyfile(
+        """
+        from nydok import testcase
+
+        @testcase(["FR001"])
+        def test_hello_default():
+            assert True
+        """
+    )
+    pytester.makefile(
+        ".spec.md",
+        "# Some heading\n\n- FR001: Requirement\n- FR001: Duplicate requirement\n",
+    )
+    result = pytester.runpytest_subprocess("-p", "nydok")
+    result.assert_outcomes(passed=2, failed=1)
+    result.stdout.re_match_lines(r"Requirement FR001 \(.*\.spec\.md:4\) is already defined in FR001 \(.*\.spec\.md:3\)")
+
+
+@testcase("FR040")
+def test_utf8_regardless_of_locale(pytester, monkeypatch):
+    pytester.plugins = ["nydok"]
+    # ASCII locale; stop Python from switching to UTF-8 on its own (PEP 538, PEP 540)
+    monkeypatch.setenv("LC_ALL", "C")
+    monkeypatch.setenv("PYTHONCOERCECLOCALE", "0")
+    monkeypatch.setenv("PYTHONUTF8", "0")
+
+    pytester.makefile(
+        ".junit.xml",
+        (
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            "<testsuites><testsuite>\n"
+            # Not in the name: pytest itself can't handle a non-ASCII test name in this locale
+            '  <testcase name="FR001: Measures" classname="Pipette µl"/>\n'
+            "</testsuite></testsuites>\n"
+        ),
+    )
+    pytester.makefile(".spec.md", "# Some heading\n\n- FR001: Must measure µl\n")
+    result = pytester.runpytest_subprocess("-p", "nydok", "--nydok-output", "nydok.json")
+    result.assert_outcomes(passed=2)
+
+    subprocess.check_call("nydok report test-cases --output report.md nydok.json", shell=True, cwd=pytester.path)
+    assert "Must measure µl" in (pytester.path / "report.md").read_text(encoding="utf-8")

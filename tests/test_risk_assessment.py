@@ -41,9 +41,7 @@ def test_risk_assessment_basic(pytester):
         """,
     )
 
-    result = pytester.runpytest_subprocess(
-        "-s", "-p", "nydok", "--nydok-risk-assessment", ra_ok_file.absolute()
-    )
+    result = pytester.runpytest_subprocess("-s", "-p", "nydok", "--nydok-risk-assessment", ra_ok_file.absolute())
 
     result.assert_outcomes(passed=2, failed=0)
 
@@ -93,13 +91,9 @@ def test_risk_assessment_missing_metadata(pytester):
             yaml.safe_dump(ra_fail_data),
         )
 
-        result = pytester.runpytest_subprocess(
-            "-p", "nydok", "--nydok-risk-assessment", ra_fail_file.absolute()
-        )
+        result = pytester.runpytest_subprocess("-p", "nydok", "--nydok-risk-assessment", ra_fail_file.absolute())
 
-        assert any(
-            "Error while checking Risk Assessment RA001" in line for line in result.stderr.lines
-        )
+        assert any("Error while checking Risk Assessment RA001" in line for line in result.stderr.lines)
 
 
 @testcase(["UR051", "FR320", "FR321"])
@@ -138,9 +132,7 @@ def test_residual_risk_priority(pytester):
     )
 
     # Default is low, should pass fine
-    result = pytester.runpytest_subprocess(
-        "-p", "nydok", "--nydok-risk-assessment", ra_file.absolute()
-    )
+    result = pytester.runpytest_subprocess("-p", "nydok", "--nydok-risk-assessment", ra_file.absolute())
     assert result.ret == 0
 
     # Test with medium risk priority
@@ -162,17 +154,11 @@ def test_residual_risk_priority(pytester):
     )
 
     # Default is low, should not pass
-    result = pytester.runpytest_subprocess(
-        "-p", "nydok", "--nydok-risk-assessment", ra_file.absolute()
-    )
+    result = pytester.runpytest_subprocess("-p", "nydok", "--nydok-risk-assessment", ra_file.absolute())
 
     assert result.ret == 3
     assert any(
-        (
-            "Risk assessment RA001: Residual risk priority 'medium'"
-            " exceeds permissable risk priority 'low'"
-        )
-        in line
+        ("Risk assessment RA001: Residual risk priority 'medium' exceeds permissable risk priority 'low'") in line
         for line in result.outlines
     )
 
@@ -188,8 +174,7 @@ def test_residual_risk_priority(pytester):
 
     assert result.ret == 0
     assert not any(
-        "Risk assessment RA001: Residual risk priority 'medium' exceeds permissable risk priority"
-        in line
+        "Risk assessment RA001: Residual risk priority 'medium' exceeds permissable risk priority" in line
         for line in result.outlines
     )
 
@@ -241,12 +226,7 @@ def test_risk_assessment_mitigation_requirement_id(pytester):
         """,
     )
 
-    result = pytester.runpytest_subprocess(
-        "-p", "nydok", "--nydok-risk-assessment", ra_file.absolute()
-    )
+    result = pytester.runpytest_subprocess("-p", "nydok", "--nydok-risk-assessment", ra_file.absolute())
 
     assert result.ret == 3
-    assert any(
-        "Risk assessment RA002: mitigation_requirement_id 'FR003' not found" in line
-        for line in result.outlines
-    )
+    assert any("Risk assessment RA002: mitigation_requirement_id 'FR003' not found" in line for line in result.outlines)

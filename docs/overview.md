@@ -59,7 +59,7 @@ An example `Requirement` could look like the following:
 
 ### Test case
 
-A test case checking the implementation of a `Requirement`. Normally written as a py.test test, but can also come from external sources.
+A test case checking the implementation of a `Requirement`. Normally written as a pytest test, but can also come from external sources.
 
 A `Test case` may include the following information and more:
 
@@ -84,13 +84,13 @@ def test_something():
 
 ## Running the tests
 
-Since nydok utilizes py.test, each `Requirement` counts as a test item in py.test. The specification files are therefore handled like a test source, yielding a set of test items. Running a py.test session with one specification file with corresponding test cases will therefore look something like the following:
+Since nydok utilizes pytest, each `Requirement` counts as a test item in pytest. The specification files are therefore handled like a test source, yielding a set of test items. Running a pytest session with one specification file with corresponding test cases will therefore look something like the following:
 
 ```
 ============================= test session starts ==============================
-platform linux -- Python 3.8.10, pytest-6.2.5, py-1.11.0, pluggy-1.0.0
+platform linux -- Python 3.14.7, pytest-9.2.0, pluggy-1.7.0
 rootdir: /project
-plugins: nydok-0.0
+plugins: nydok-1.0.0
 collected 13 items
 tests/test_urs_spec.py ..                                                [ 50%]
 tests/urs.spec.md ...........                                            [100%]
@@ -101,7 +101,7 @@ Here two test cases in `test_urs_spec.py` together refers to the 11 requirements
 
 ## How to structure your tests
 
-Since nydok is a py.test plugin, it utilizes py.test's collection of tests to scan for both requirements and tests. You can therefore either put the specification files in one directory and test cases in another, or mix them both in the same directory, as long as you provide all relevant paths when running py.test.
+Since nydok is a pytest plugin, it utilizes pytest's collection of tests to scan for both requirements and tests. You can therefore either put the specification files in one directory and test cases in another, or mix them both in the same directory, as long as you provide all relevant paths when running pytest.
 
 One suggested structure is the following, but what's best will likely depend on the surrounding tooling:
 

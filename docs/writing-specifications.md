@@ -67,10 +67,10 @@ The references added within the brackets `[]` can be any kind of ID. This lets y
 
 ## Changing the requirement format
 
-You can change the format of the requirements by changing the regex used to match them. This is done by setting the `--nydok-specs-regex` option when running `py.test`. The regex should contain three named groups: `req_id`, `refs` and `desc`. The default regex is given below:
+You can change the format of the requirements by changing the regex used to match them. This is done by setting the `--nydok-specs-regex` option when running `pytest`. The regex should contain three named groups: `req_id`, `refs` and `desc`. The default regex is given below:
 
 ```bash
 
-py.test --nydok-specs-regex='-(?P<req_id>[A-Z]+[0-9]+)( \[(?P<refs>[A-Z,0-9]+)\])?: (?P<desc>.*)' specifications/
+pytest --nydok-specs-regex='-(?P<req_id>[A-Z]+[0-9]+)( \[(?P<refs>[A-Z,0-9]+)\])?: (?P<desc>.*)' specifications/
 
 ```

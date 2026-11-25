@@ -1,20 +1,23 @@
+"""Data classes for requirements, test cases and risk assessments, as stored in nydok's results JSON."""
+
 import dataclasses
 import json
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 
 class DataclassJsonEncoder(json.JSONEncoder):
-    def default(self, o):
-        if dataclasses.is_dataclass(o):
+    """JSON encoder that also handles data classes, paths and dates."""
+
+    def default(self, o: object) -> object:
+        """Convert data classes, paths and dates, which the standard encoder can't handle."""
+        if dataclasses.is_dataclass(o) and not isinstance(o, type):
             return dataclasses.asdict(o)
-        elif isinstance(o, Path):
+        if isinstance(o, Path):
             return str(o)
-        elif isinstance(o, datetime):
-            return o.isoformat()
-        elif isinstance(o, date):
+        if isinstance(o, date):  # Also datetime, a subclass
             return o.isoformat()
         return super().default(o)
 
@@ -51,28 +54,49 @@ RISK_ASSESSMENT_PRIORITY = {
 
 @dataclass
 class TestCase:
-    ids: List[str]
-    testcase_id: str
+    """A test covering one or more requirements: a `@testcase` function or a JUnit test case.
+
+    Attributes:
+        ids: IDs of the requirements it covers.
+        testcase_id: Test case ID, e.g. "TC001". None until numbered by the SpecsManager, and stays
+            None for `skip` test cases without one.
+        io: Test data, as (input, expected output) tuples.
+        func_name: Name of the test function; for a JUnit test case, its class name.
+        func_src: Source code of the test function; None for a JUnit test case.
+        skip: Whether the test case only adds metadata, and isn't numbered.
+    """
+
+    __test__ = False  # Not a pytest test class, despite the name
+
+    ids: list[str]
+    testcase_id: str | None
     desc: str
-    io: List[Tuple[Any, Any]]
+    io: list[tuple[Any, Any]] | None
     func_name: str
-    func_src: str
-    ref_ids: List[str]
+    func_src: str | None
+    ref_ids: list[str] | None
     skip: bool
     passed: bool
 
 
 @dataclass
 class Requirement:
+    """A requirement from a specification file."""
+
     id: str
     desc: str
     file_path: Path
     line_no: int
-    ref_ids: List[str]
+    ref_ids: list[str]
 
 
 @dataclass
 class RiskAssessment:
+    """A risk assessment item, with its risk priority before and after mitigation.
+
+    The probability, severity and detectability levels are "low", "medium" or "high".
+    """
+
     id: str
     description: str
     consequence: str
@@ -80,12 +104,13 @@ class RiskAssessment:
     prior_severity: str
     prior_detectability: str
     mitigation: str
-    mitigation_requirement_ids: List[str]
+    mitigation_requirement_ids: list[str]
     residual_probability: str
     residual_severity: str
     residual_detectability: str
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
+        """Check that the risk levels are "low", "medium" or "high" and the text fields are given."""
         risk_fields = [
             "prior_probability",
             "prior_severity",
@@ -109,29 +134,23 @@ class RiskAssessment:
         ]
         for attrib in required_attribs:
             if not getattr(self, attrib):
-                raise ValueError(
-                    f"Error while checking Risk Assessment {self.id}: {attrib} must be defined"
-                )
+                raise ValueError(f"Error while checking Risk Assessment {self.id}: {attrib} must be defined")
 
     @property
     def prior_risk_priority(self) -> str:
+        """Risk priority before mitigation: "low", "medium" or "high"."""
         prior_risk_class = RISK_ASSESSMENT_CLASS[self.prior_probability][self.prior_severity]
-        prior_risk_priority = RISK_ASSESSMENT_PRIORITY[prior_risk_class][self.prior_detectability]
-        return prior_risk_priority
+        return RISK_ASSESSMENT_PRIORITY[prior_risk_class][self.prior_detectability]
 
     @property
     def residual_risk_priority(self) -> str:
-        residual_risk_class = RISK_ASSESSMENT_CLASS[self.residual_probability][
-            self.residual_severity
-        ]
-        residual_risk_priority = RISK_ASSESSMENT_PRIORITY[residual_risk_class][
-            self.residual_detectability
-        ]
-        return residual_risk_priority
+        """Risk priority after mitigation: "low", "medium" or "high"."""
+        residual_risk_class = RISK_ASSESSMENT_CLASS[self.residual_probability][self.residual_severity]
+        return RISK_ASSESSMENT_PRIORITY[residual_risk_class][self.residual_detectability]
 
     @classmethod
-    def from_dict(cls, _id, risk_dict_object: Dict):
-        """Populate a RiskAssessment from a dictionary object from a yaml-file."""
+    def from_dict(cls, _id: str, risk_dict_object: dict[str, Any]) -> "RiskAssessment":
+        """Create a RiskAssessment from its entry in the risk assessment YAML file."""
         _risk_dict_object = dict(risk_dict_object)
         _risk_dict_object.setdefault("id", _id)
         _risk_dict_object.setdefault("mitigation_requirement_ids", [])
