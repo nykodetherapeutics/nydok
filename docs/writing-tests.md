@@ -1,16 +1,16 @@
 # Writing test cases
 
-As nydok is integrated into py.test, writing tests within py.test is naturally the recommended way of writing tests.
+As nydok is integrated into pytest, writing tests within pytest is naturally the recommended way of writing tests.
 
 However, in most settings you'll need to integrate tests from other software. nydok support JUnit XML format in case you need to integrate other software tests.
 
 
-## Writing test cases with py.test
+## Writing test cases with pytest
 
 Given a requirement in a specification file with no test case implemented, nydok will fail the `Requirement` with a message like the following:
 
-``` title="py.test output"
-Requirement FR100 (/project/tests/myspec.spec.md:105) is missing implementation:
+``` title="pytest output"
+Requirement FR100 (/project/tests/myspec.spec.md:105) is missing test case:
 
 @testcase("FR100")
 def test_something():
@@ -134,7 +134,7 @@ def test_something():
 
 ## Mixing test cases and normal tests
 
-Since nydok integrates with py.test, it can run your requirements, test cases and normal unit tests in one go. You therefore have the possibility to mix and match like the following:
+Since nydok integrates with pytest, it can run your requirements, test cases and normal unit tests in one go. You therefore have the possibility to mix and match like the following:
 
 ```python title="Mixing test cases and normal unit tests"
 

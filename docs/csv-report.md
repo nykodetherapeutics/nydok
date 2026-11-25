@@ -6,7 +6,7 @@ Thus, how to compile a complete CSV report is very much up to you, nydok gives y
 
 That said, here is an example of how you could get started to create a complete PDF report in a CI pipeline:
 
-- Run `py.test` to run the tests and generate the `nydok.json` file
+- Run `pytest` to run the tests and generate the `nydok.json` file
 - Create all the nydok report parts you want to include into the report, like code review report, traceability matrix, test report, etc.
 - Compile your specifications and nydok reports into HTML and concatenate them into one HTML file.
 - Use a tool to convert the HTML file into a PDF file.
